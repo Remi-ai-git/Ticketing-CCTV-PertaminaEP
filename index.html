@@ -1409,7 +1409,7 @@ function renderRpt(){
       <td class="td-mono">${fDT(t.openTime)}</td><td class="td-mono">${fDT(t.closeTime)}</td>
       <td class="td-mono">${c.totalMins.toFixed(1)}</td>
       <td class="td-mono" style="color:var(--yellow)">${c.holdMins.toFixed(1)}</td>
-      <td class="td-mono" style="color:var(--cyan)">${c.mttr.toFixed(1)}</td>
+      <td class="td-mono" style="color:var(--cyan)">${c.efektif.toFixed(1)}</td>
       <td class="td-mono" style="color:var(--purple)">${fMon(c.tarif)}</td>
       <td>${slaBadge(c.sla)}</td>
       <td class="td-mono" style="color:${c.restitusi>0?'var(--red)':'var(--green)'}">${fMon(c.restitusi)}</td>
@@ -1601,7 +1601,7 @@ function openDetail(id){
     const c=calc(t);
     if(t.status==='CLOSE'){
       document.getElementById('dt-calc').style.display='grid';
-      document.getElementById('dt-mttr').textContent=fDur(c.mttr)+' ('+c.mttr.toFixed(1)+' mnt)';
+      document.getElementById('dt-mttr').textContent=fDur(c.mttr)+' ('+c.efektif.toFixed(1)+' mnt)';
       document.getElementById('dt-sla').innerHTML=slaBadge(c.sla);
       document.getElementById('dt-tarif').textContent=fMon(c.tarif);
       document.getElementById('dt-rest').textContent=fMon(c.restitusi);
@@ -1793,7 +1793,7 @@ function exportCSV(){
   const hdr=['ID Tiket','Bulan','Tahun','Field','Site','Lokasi','Perangkat','PJ','Dibuat Oleh','Time In','Time Close','Durasi Total(Mnt)','Hold(Mnt)','MTTR(Mnt)','Tarif','SLA(%)','Restitusi','Denda','Problem','Solution','Ganti Perangkat'];
   const rows=list.map(t=>{
     const c=calc(t);
-    return[t.id,MONTHS[getMonth(t.openTime)],getYear(t.openTime),t.field,t.site,t.lokasi||'',t.perangkat,t.pj,t.createdBy||'—',fDT(t.openTime),fDT(t.closeTime),c.totalMins.toFixed(1),c.holdMins.toFixed(1),c.mttr.toFixed(1),c.tarif,(c.sla*100).toFixed(2),c.restitusi.toFixed(2),c.denda.toFixed(2),t.problem||'',t.solution||'',t.gantiPerangkat]
+    return[t.id,MONTHS[getMonth(t.openTime)],getYear(t.openTime),t.field,t.site,t.lokasi||'',t.perangkat,t.pj,t.createdBy||'—',fDT(t.openTime),fDT(t.closeTime),c.totalMins.toFixed(1),c.holdMins.toFixed(1),c.efektif.toFixed(1),c.tarif,(c.sla*100).toFixed(2),c.restitusi.toFixed(2),c.denda.toFixed(2),t.problem||'',t.solution||'',t.gantiPerangkat]
     .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
   });
   const blob=new Blob(['\uFEFF'+[hdr.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8'});
