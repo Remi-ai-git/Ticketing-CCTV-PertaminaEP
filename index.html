@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CCTV Pertamina EP — Ticketing System</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0f1a;--s1:#111827;--s2:#1a2235;--s3:#1f2d45;
+  --bdr:#2a3a55;--bdr2:#334a6e;
+  --txt:#dde4f0;--muted:#6b7d99;--muted2:#4a5a75;
+  --blue:#3b82f6;--blue2:#1d4ed8;--blue-bg:rgba(59,130,246,.12);
+  --green:#22c55e;--green-bg:rgba(34,197,94,.12);
+  --yellow:#f59e0b;--yellow-bg:rgba(245,158,11,.12);
+  --red:#ef4444;--red-bg:rgba(239,68,68,.12);
+  --orange:#f97316;--orange-bg:rgba(249,115,22,.12);
+  --cyan:#06b6d4;--cyan-bg:rgba(6,182,212,.12);
+  --purple:#a855f7;--purple-bg:rgba(168,85,247,.12);
+}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:13px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--s1)}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+
+/* ══ LOGIN PAGE ══════════════════════════════════════ */
+#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;
+  background:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.08) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 20%,rgba(6,182,212,.06) 0%,transparent 50%),
+             var(--bg);}
+.login-box{background:var(--s1);border:1px solid var(--bdr2);border-radius:16px;padding:40px;width:400px;max-width:95vw}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .icon{width:56px;height:56px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:12px;box-shadow:0 8px 32px rgba(59,130,246,.25)}
+.login-logo h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.login-logo p{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.5px;text-transform:uppercase}
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.login-field input{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:10px 13px;font-size:13px;color:var(--txt);font-family:inherit;outline:none;transition:border-color .15s}
+.login-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.login-err{background:var(--red-bg);border:1px solid rgba(239,68,68,.3);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--red);margin-bottom:12px;display:none}
+.login-err.show{display:block}
+.btn-login{width:100%;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:4px}
+.btn-login:hover{background:var(--blue2);box-shadow:0 4px 16px rgba(59,130,246,.3)}
+
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:36px}
+.pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted);font-size:14px;background:none;border:none;padding:2px}
+.pw-eye:hover{color:var(--txt)}
+
+/* ══ APP SHELL ══════════════════════════════════════ */
+#app-shell{display:none}
+nav{background:var(--s1);border-bottom:1px solid var(--bdr);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100}
+.nav-left{display:flex;align-items:center;gap:12px}
+.logo{width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.brand h1{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.brand p{font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.nav-tabs{display:flex;gap:2px}
+.ntab{padding:5px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);border:none;background:none;transition:all .15s}
+.ntab:hover{color:var(--txt);background:var(--s2)}
+.ntab.active{color:var(--blue);background:var(--blue-bg);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:8px}
+.user-chip{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--bdr);border-radius:20px;padding:4px 12px 4px 4px}
+.user-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.user-name{font-size:11px;font-weight:600}
+.user-role{font-size:10px;color:var(--muted)}
+.logout-btn{background:var(--red-bg);border:1px solid rgba(239,68,68,.2);color:var(--red);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.logout-btn:hover{background:rgba(239,68,68,.2)}
+.clock{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);background:var(--s2);padding:4px 10px;border-radius:5px;border:1px solid var(--bdr)}
+
+main{padding:20px;max-width:1400px;margin:0 auto}
+.page{display:none}.page.active{display:block}
+
+/* ══ STATS ══ */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat.blue::before{background:var(--blue)}.stat.green::before{background:var(--green)}.stat.yellow::before{background:var(--yellow)}.stat.red::before{background:var(--red)}.stat.purple::before{background:var(--purple)}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.stat-val{font-size:26px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin:6px 0 2px;letter-spacing:-1px}
+.stat-sub{font-size:11px;color:var(--muted)}
+.stat.blue .stat-val{color:var(--blue)}.stat.green .stat-val{color:var(--green)}.stat.yellow .stat-val{color:var(--yellow)}.stat.red .stat-val{color:var(--red)}.stat.purple .stat-val{color:var(--purple)}
+
+/* ══ TABLE ══ */
+.tbl-wrap{background:var(--s1);border:1px solid var(--bdr);border-radius:10px;overflow:hidden}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bdr);flex-wrap:wrap;gap:8px}
+.tbl-title{font-size:14px;font-weight:600}
+input.search-box{background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--txt);font-family:inherit;outline:none;width:200px}
+input.search-box:focus{border-color:var(--blue)}
+select.filter{background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:5px 8px;font-size:12px;color:var(--txt);font-family:inherit;outline:none;cursor:pointer}
+select.filter:focus{border-color:var(--blue)}
+table{width:100%;border-collapse:collapse}
+thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);background:var(--s2);border-bottom:1px solid var(--bdr);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--bdr);transition:background .1s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--s2)}
+td{padding:10px 12px;font-size:12px;vertical-align:middle}
+.td-mono{font-family:'IBM Plex Mono',monospace;font-size:11px}
+
+/* ══ BADGES ══ */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+.badge-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.b-open{background:var(--green-bg);color:var(--green)}.b-open .badge-dot{background:var(--green);animation:pulse 1.5s infinite}
+.b-hold{background:var(--yellow-bg);color:var(--yellow)}.b-hold .badge-dot{background:var(--yellow)}
+.b-close{background:rgba(100,116,139,.15);color:#94a3b8}.b-close .badge-dot{background:#94a3b8}
+.b-sla-ok{background:var(--green-bg);color:var(--green)}.b-sla-warn{background:var(--yellow-bg);color:var(--yellow)}.b-sla-fail{background:var(--red-bg);color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ══ BUTTONS ══ */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue2)}
+.btn-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.3)}.btn-green:hover{background:rgba(34,197,94,.2)}
+.btn-yellow{background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}.btn-yellow:hover{background:rgba(245,158,11,.2)}
+.btn-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.3)}.btn-red:hover{background:rgba(239,68,68,.2)}
+.btn-ghost{background:var(--s2);color:var(--txt);border:1px solid var(--bdr)}.btn-ghost:hover{background:var(--s3)}
+.export-btn{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(168,85,247,.3);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.export-btn:hover{background:rgba(168,85,247,.2)}
+
+/* ══ TIMER CHIP ══ */
+.timer-chip{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--s2);border:1px solid var(--bdr);padding:2px 8px;border-radius:4px;color:var(--cyan)}
+.timer-chip.running{border-color:var(--green);color:var(--green)}
+.timer-chip.hold{border-color:var(--yellow);color:var(--yellow)}
+
+/* ══ MODAL ══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.show{opacity:1;pointer-events:all}
+.modal{background:var(--s1);border:1px solid var(--bdr2);border-radius:14px;width:600px;max-width:96vw;max-height:90vh;overflow-y:auto;padding:26px;transform:scale(.95) translateY(10px);transition:transform .2s}
+.overlay.show .modal{transform:scale(1) translateY(0)}
+.modal-lg{width:840px}
+.modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:16px;font-weight:700}
+.modal-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.close-btn{background:var(--s2);border:1px solid var(--bdr);color:var(--muted);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.close-btn:hover{color:var(--txt)}
+
+/* ══ FORM ══ */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg-full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:5px}
+label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+input:not(.search-box):not(.login-field input),select,textarea{background:var(--s2);border:1px solid var(--bdr);border-radius:7px;padding:8px 11px;font-size:13px;color:var(--txt);font-family:inherit;outline:none;transition:border-color .15s}
+input:not(.search-box):not(.login-field input):focus,select:focus,textarea:focus{border-color:var(--blue)}
+input::placeholder{color:var(--muted2)}
+textarea{resize:vertical;min-height:80px}
+.field-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid var(--bdr2);background:var(--s2);cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .15s}
+.chip:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.chip.selected{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);font-weight:700}
+.form-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--bdr)}
+.req{color:var(--red)}
+.err-msg{font-size:11px;color:var(--red);display:none}
+.err-msg.show{display:block}
+
+/* ══ DETAIL ══ */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.dg3{grid-template-columns:1fr 1fr 1fr}
+.detail-item{background:var(--s2);border-radius:7px;padding:10px 12px;border:1px solid var(--bdr)}
+.detail-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.detail-val{font-size:13px;font-weight:500}
+.detail-full{grid-column:1/-1}
+.timeline{border-left:2px solid var(--bdr2);margin-left:8px;padding-left:16px}
+.tl-item{position:relative;margin-bottom:12px}
+.tl-item::before{content:'';position:absolute;left:-21px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--blue);border:2px solid var(--s1);box-shadow:0 0 0 1px var(--bdr2)}
+.tl-item.hold::before{background:var(--yellow)}.tl-item.close::before{background:var(--green)}.tl-item.resume::before{background:var(--cyan)}.tl-item.edit::before{background:var(--blue)}.tl-item.edit .tl-time{color:var(--blue)}
+.tl-time{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.tl-text{font-size:12px;margin-top:2px}
+.tl-just{font-size:11px;color:var(--yellow);margin-top:2px;font-style:italic}
+.hold-bar{background:var(--yellow-bg);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px}
+
+/* ══ REPORT ══ */
+.report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.report-card{background:var(--s2);border:1px solid var(--bdr);border-radius:9px;padding:14px}
+.report-card-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.metric{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bdr)}
+.metric:last-child{border-bottom:none}
+.metric-label{font-size:12px;color:var(--muted)}
+.metric-val{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600}
+
+/* ══ PERIOD FILTER BAR ══ */
+.period-bar{background:var(--s2);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.period-bar label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.month-chips{display:flex;flex-wrap:wrap;gap:5px}
+.mchip{padding:4px 12px;border-radius:20px;border:1px solid var(--bdr2);background:var(--s1);cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);transition:all .15s}
+.mchip:hover{border-color:var(--blue);color:var(--blue)}
+.mchip.sel{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+.mchip.all-sel{background:var(--s3);border-color:var(--bdr2);color:var(--txt)}
+
+/* ══ MISC ══ */
+.filter-tabs{display:flex;gap:4px;margin-bottom:14px}
+.ftab{padding:5px 14px;border-radius:20px;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);transition:all .15s}
+.ftab:hover{color:var(--txt)}
+.ftab.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s3);border:1px solid var(--bdr2);border-radius:8px;padding:10px 16px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;z-index:999;transform:translateY(60px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateY(0);opacity:1}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.sec-title{font-size:15px;font-weight:700}
+.divider{border:none;border-top:1px solid var(--bdr);margin:16px 0}
+.progress-wrap{background:var(--s3);border-radius:4px;height:6px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.empty-title{font-size:14px;font-weight:600;color:var(--txt);margin-bottom:4px}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.manual-card{background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:20px;margin-bottom:16px}
+.manual-card-title{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.info-box{background:var(--orange-bg);border:1px solid rgba(249,115,22,.3);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--orange);margin-bottom:16px;line-height:1.6}
+.sla-preview{background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:12px;margin-top:8px}
+.sla-preview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.sla-box{background:var(--s1);border-radius:6px;padding:8px 10px;text-align:center;border:1px solid var(--bdr)}
+.sla-box-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.sla-box-val{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700}
+
+/* ══ MOBILE NAV DRAWER ══ */
+.ham-btn{display:none;background:none;border:none;color:var(--txt);cursor:pointer;padding:6px;font-size:22px;line-height:1;flex-shrink:0}
+.mob-nav-overlay{display:none;position:fixed;inset:0;top:54px;background:rgba(0,0,0,.6);z-index:200}
+.mob-nav-overlay.show{display:block}
+.mob-nav-drawer{position:fixed;top:54px;left:0;bottom:0;width:220px;background:var(--s1);border-right:1px solid var(--bdr2);z-index:201;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;gap:4px;padding:12px 10px;overflow-y:auto}
+.mob-nav-drawer.open{transform:translateX(0)}
+.mob-ntab{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);border:none;background:none;font-family:inherit;width:100%;text-align:left;transition:all .15s}
+.mob-ntab:hover{color:var(--txt);background:var(--s2)}
+.mob-ntab.active{color:var(--blue);background:var(--blue-bg);font-weight:700}
+
+/* ══ RESPONSIVE BREAKPOINTS ══ */
+@media(max-width:900px){
+  .nav-tabs{gap:1px}
+  .ntab{padding:5px 10px;font-size:11.5px}
+  .clock{display:none}
+  .brand p{display:none}
+  .stats{grid-template-columns:repeat(3,1fr)}
+}
+
+@media(max-width:768px){
+  /* NAV */
+  nav{padding:0 12px;height:54px}
+  .nav-tabs{display:none}
+  .ham-btn{display:flex;align-items:center;justify-content:center}
+  .brand h1{font-size:13px}
+  .brand p{display:none}
+  .user-chip{padding:4px 8px 4px 4px;gap:5px}
+  .user-name{display:none}
+  .user-role{display:none}
+  .clock{display:none}
+  .logout-btn{padding:4px 8px;font-size:11px}
+
+  /* MAIN CONTENT */
+  main{padding:12px}
+
+  /* STATS */
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+  .stat{padding:12px 13px}
+  .stat-val{font-size:22px}
+
+  /* DASHBOARD 2-COL GRID → 1 COL */
+  .dash-2col{display:block!important}
+  .dash-2col > div{margin-bottom:12px}
+
+  /* FORMS */
+  .form-grid{grid-template-columns:1fr}
+  .fg-full{grid-column:1/-1}
+
+  /* REPORT GRID */
+  .report-grid{grid-template-columns:1fr 1fr;gap:10px}
+
+  /* PERIOD BAR */
+  .period-bar{padding:10px 12px;gap:8px}
+  .period-bar label{font-size:10px}
+  #period-summary{margin-left:0;margin-top:4px;width:100%}
+
+  /* TABLE HEAD */
+  .tbl-head{padding:12px}
+  .tbl-title{font-size:13px}
+  input.search-box{width:100%;max-width:100%}
+  select.filter{width:100%}
+  .tbl-head > div[style*="display:flex"]{width:100%}
+  .sec-hdr{flex-direction:column;align-items:stretch;gap:8px}
+  .sec-hdr > div[style*="display:flex"]{flex-wrap:wrap;gap:6px}
+  .sec-hdr > div[style*="display:flex"] input,
+  .sec-hdr > div[style*="display:flex"] select{width:100%}
+
+  /* FILTER TABS */
+  .filter-tabs{flex-wrap:wrap;gap:5px;margin-bottom:10px}
+  .ftab{font-size:10.5px;padding:4px 10px}
+
+  /* MODALS */
+  .overlay{align-items:flex-end;padding:0}
+  .modal{border-radius:16px 16px 0 0;max-width:100vw;max-height:92vh;padding:20px 16px;margin:0}
+  .modal-lg{width:100%}
+  .modal-hdr{margin-bottom:14px}
+  .modal-title{font-size:15px}
+
+  /* SLA PREVIEW GRID */
+  .sla-preview-grid{grid-template-columns:1fr 1fr}
+
+  /* DETAIL GRID */
+  .detail-grid{grid-template-columns:1fr 1fr}
+  .detail-grid.dg3{grid-template-columns:1fr 1fr}
+  .detail-full{grid-column:1/-1}
+
+  /* BUTTONS */
+  .btn{padding:8px 12px;font-size:12px}
+  .export-btn{font-size:11px;padding:6px 10px}
+
+  /* FORM FOOTER */
+  .form-footer{flex-direction:column;gap:8px}
+  .form-footer .btn{width:100%;justify-content:center}
+
+  /* MANUAL CARD */
+  .manual-card{padding:14px}
+
+  /* MONTH CHIPS */
+  .month-chips{gap:4px}
+  .mchip{padding:3px 9px;font-size:10.5px}
+}
+
+@media(max-width:480px){
+  /* STATS → full single column */
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat-val{font-size:20px}
+
+  /* REPORT GRID → 1 col */
+  .report-grid{grid-template-columns:1fr}
+
+  /* DETAIL GRID → 1 col */
+  .detail-grid{grid-template-columns:1fr}
+  .detail-grid.dg3{grid-template-columns:1fr}
+
+  /* SLA PREVIEW GRID */
+  .sla-preview-grid{grid-template-columns:1fr 1fr}
+
+  /* NAV brand */
+  .brand h1{font-size:12px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* TIKET TABLE: add horizontal scroll hint */
+  .tbl-wrap{position:relative}
+
+  main{padding:8px}
+
+  /* MODAL full-height on tiny screens */
+  .modal{max-height:96vh;padding:16px 12px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon">📡</div>
+      <h1>Pertamina EP — CCTV</h1>
+      <p>Helpdesk Ticketing System</p>
+    </div>
+    <div class="login-err" id="login-err">Username atau password salah</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="inp-user" placeholder="Masukkan username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="inp-pass" placeholder="Masukkan password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <button class="pw-eye" onclick="togglePw()" id="pw-eye-btn">👁</button>
+      </div>
+    </div>
+    <button class="btn-login" onclick="doLogin()">🔐 Masuk</button>
+  </div>
+</div>
+
+<!-- ═══════════════ APP SHELL ═══════════════ -->
+<div id="app-shell">
+<!-- Mobile Nav Drawer -->
+<div class="mob-nav-overlay" id="mob-overlay" onclick="closeMobileNav()"></div>
+<div class="mob-nav-drawer" id="mob-drawer">
+  <button class="mob-ntab active" id="mob-tab-dashboard" onclick="showPage('dashboard');closeMobileNav()">📊 Dashboard</button>
+  <button class="mob-ntab" id="mob-tab-tiket" onclick="showPage('tiket');closeMobileNav()">🎫 Tiket</button>
+  <button class="mob-ntab" id="mob-tab-laporan" onclick="showPage('laporan');closeMobileNav()">📈 Laporan SLA</button>
+  <button class="mob-ntab" id="mob-tab-manual" onclick="showPage('manual');closeMobileNav()" style="display:none;color:var(--orange)">📝 Input Manual</button>
+</div>
+<nav>
+  <div class="nav-left">
+    <button class="ham-btn" id="ham-btn" onclick="toggleMobileNav()">☰</button>
+    <div class="logo">📡</div>
+    <div class="brand"><h1>Pertamina EP — CCTV Ticketing</h1><p>Network Complaint Management</p></div>
+  </div>
+  <div class="nav-tabs">
+    <button class="ntab active" id="tab-dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+    <button class="ntab" id="tab-tiket" onclick="showPage('tiket')">🎫 Tiket</button>
+    <button class="ntab" id="tab-laporan" onclick="showPage('laporan')">📈 Laporan SLA</button>
+    <button class="ntab" id="tab-manual" onclick="showPage('manual')" style="display:none;color:var(--orange);border:1px solid rgba(249,115,22,.3);background:var(--orange-bg)">📝 Input Manual</button>
+  </div>
+  <div class="nav-right">
+    <div class="clock" id="clock">--:--:--</div>
+    <div class="user-chip">
+      <div class="user-avatar" id="nav-avatar" style="background:var(--blue-bg);color:var(--blue)">--</div>
+      <div><div class="user-name" id="nav-uname">—</div><div class="user-role" id="nav-role">—</div></div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">⏻ Logout</button>
+  </div>
+</nav>
+<main>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="stats" id="dash-stats"></div>
+  <div class="dash-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="tbl-wrap">
+      <div class="tbl-head"><span class="tbl-title">📊 SLA Per Field</span></div>
+      <div style="padding:14px" id="sla-bars"></div>
+    </div>
+    <div class="tbl-wrap">
+      <div class="tbl-head"><span class="tbl-title">🔔 Aktivitas Terbaru</span></div>
+      <div id="recent-act"></div>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-head">
+      <span class="tbl-title">⚡ Tiket Aktif</span>
+      <button id="btn-create" class="btn btn-primary" onclick="openCreateModal()">＋ Create Tiket</button>
+    </div>
+    <div id="active-tbl"></div>
+  </div>
+</div>
+
+<!-- TIKET -->
+<div id="page-tiket" class="page">
+  <div class="sec-hdr">
+    <span class="sec-title">Semua Tiket</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input class="search-box" placeholder="🔍 Cari ID, field, site..." id="srch" oninput="renderAll()"/>
+      <select class="filter" id="ff" onchange="renderAll()"><option value="">Semua Field</option><option>PRABUMULIH</option><option>PENDOPO</option><option>RAMBA</option><option>LIMAU</option><option>ADERA</option><option>JAMBI</option><option>PANGKALAN SUSU</option><option>LIRIK</option></select>
+      <select class="filter" id="fs" onchange="renderAll()"><option value="">Semua Status</option><option>OPEN</option><option>ON HOLD</option><option>CLOSE</option></select>
+      <button class="btn btn-primary" onclick="openCreateModal()">＋ Create Tiket</button>
+    </div>
+  </div>
+  <div class="filter-tabs">
+    <button class="ftab active" onclick="setFtab(this,'all')">Semua</button>
+    <button class="ftab" onclick="setFtab(this,'OPEN')">🟢 Open</button>
+    <button class="ftab" onclick="setFtab(this,'ON HOLD')">🟡 On Hold</button>
+    <button class="ftab" onclick="setFtab(this,'CLOSE')">⚫ Close</button>
+  </div>
+  <div class="tbl-wrap"><div id="all-tbl"></div></div>
+</div>
+
+<!-- LAPORAN -->
+<div id="page-laporan" class="page">
+  <div class="sec-hdr">
+    <span class="sec-title">📋 Laporan SLA, Restitusi &amp; Denda</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select class="filter" id="rptf" onchange="renderRpt()"><option value="">Semua Field</option><option>PRABUMULIH</option><option>PENDOPO</option><option>RAMBA</option><option>LIMAU</option><option>ADERA</option><option>JAMBI</option><option>PANGKALAN SUSU</option><option>LIRIK</option></select>
+      <select class="filter" id="rptp" onchange="renderRpt()"><option value="">Semua Perangkat</option></select>
+      <select class="filter" id="rpty" onchange="renderRpt()"><option value="">Semua Tahun</option></select>
+      <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+  </div>
+
+  <!-- PERIOD FILTER BAR -->
+  <div class="period-bar">
+    <label>📅 Filter Bulan:</label>
+    <div class="month-chips" id="month-chips">
+      <div class="mchip all-sel" onclick="selAllMonths(this)">Semua</div>
+      <div class="mchip" onclick="toggleMonth(this,'1')">JAN</div>
+      <div class="mchip" onclick="toggleMonth(this,'2')">FEB</div>
+      <div class="mchip" onclick="toggleMonth(this,'3')">MAR</div>
+      <div class="mchip" onclick="toggleMonth(this,'4')">APR</div>
+      <div class="mchip" onclick="toggleMonth(this,'5')">MEI</div>
+      <div class="mchip" onclick="toggleMonth(this,'6')">JUN</div>
+      <div class="mchip" onclick="toggleMonth(this,'7')">JUL</div>
+      <div class="mchip" onclick="toggleMonth(this,'8')">AGU</div>
+      <div class="mchip" onclick="toggleMonth(this,'9')">SEP</div>
+      <div class="mchip" onclick="toggleMonth(this,'10')">OKT</div>
+      <div class="mchip" onclick="toggleMonth(this,'11')">NOV</div>
+      <div class="mchip" onclick="toggleMonth(this,'12')">DES</div>
+    </div>
+    <div id="period-summary" style="font-size:11px;color:var(--muted);margin-left:auto"></div>
+  </div>
+
+  <div class="report-grid" id="rpt-cards"></div>
+  <div class="tbl-wrap">
+    <div class="tbl-head"><span class="tbl-title">Detail Perhitungan</span><span id="rpt-count" style="font-size:11px;color:var(--muted)"></span></div>
+    <div class="tbl-scroll">
+    <table><thead><tr>
+      <th>No</th><th>ID Tiket</th><th>Bulan</th><th>Field</th><th>Site</th><th>Perangkat</th>
+      <th>Time In</th><th>Time Close</th><th>Durasi (Mnt)</th><th>Hold (Mnt)</th>
+      <th>MTTR (Mnt)</th><th>Tarif/Bln</th><th>SLA</th><th>Restitusi</th><th>Denda</th>
+    </tr></thead><tbody id="rpt-body"></tbody>
+    <tfoot id="rpt-foot"></tfoot>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PAGE INPUT MANUAL (CO1 ONLY) ══════════ -->
+<div id="page-manual" class="page">
+  <div class="sec-hdr">
+    <span class="sec-title">📝 Input Tiket Manual
+      <span style="font-size:11px;color:var(--orange);font-weight:400;background:var(--orange-bg);padding:2px 10px;border-radius:4px;margin-left:8px;border:1px solid rgba(249,115,22,.3)">CO1 Only</span>
+    </span>
+  </div>
+  <!-- Tab Mode: CLOSE vs OPEN -->
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <button id="mtab-close" class="btn" onclick="setManualMode('CLOSE')"
+      style="background:var(--green);color:#fff;font-size:12px;padding:7px 18px">
+      ✅ Input CLOSE
+    </button>
+    <button id="mtab-open" class="btn btn-ghost" onclick="setManualMode('OPEN')"
+      style="font-size:12px;padding:7px 18px">
+      🔴 Input OPEN
+    </button>
+  </div>
+  <div class="info-box" id="m-infobox">
+    ⚠️ Modul ini digunakan untuk menginput tiket dengan <strong>tanggal &amp; jam yang ditentukan sendiri</strong> — misalnya untuk mengisi data bulan lalu yang belum terinput.
+    ID Tiket akan dibuat otomatis sesuai bulan <strong>Time In</strong> yang diisi.
+  </div>
+  <div class="manual-card">
+    <div class="manual-card-title">📋 Data Tiket</div>
+    <div class="form-grid">
+      <div class="form-group fg-full">
+        <label>Nama Field <span class="req">*</span></label>
+        <div class="field-chips" id="mfchips">
+          <div class="chip selected" onclick="mSelField(this)" data-v="PRABUMULIH">PRABUMULIH</div>
+          <div class="chip" onclick="mSelField(this)" data-v="PENDOPO">PENDOPO</div>
+          <div class="chip" onclick="mSelField(this)" data-v="RAMBA">RAMBA</div>
+          <div class="chip" onclick="mSelField(this)" data-v="LIMAU">LIMAU</div>
+          <div class="chip" onclick="mSelField(this)" data-v="ADERA">ADERA</div>
+          <div class="chip" onclick="mSelField(this)" data-v="JAMBI">JAMBI</div>
+          <div class="chip" onclick="mSelField(this)" data-v="PANGKALAN SUSU">PANGKALAN SUSU</div>
+          <div class="chip" onclick="mSelField(this)" data-v="LIRIK">LIRIK</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nama Site <span class="req">*</span></label>
+        <input type="text" id="m-site" placeholder="Contoh: SP BETUNG"/>
+        <span class="err-msg" id="em-site">Wajib diisi</span>
+      </div>
+      <div class="form-group">
+        <label>Lokasi CCTV</label>
+        <input type="text" id="m-lok" placeholder="Contoh: GERBANG MASUK"/>
+      </div>
+      <div class="form-group">
+        <label>Jenis Perangkat <span class="req">*</span></label>
+        <select id="m-perangkat" onchange="updateManualPreview()">
+          <option value="">— Pilih Perangkat —</option>
+          <option value="CCTV Tipe A">CCTV ODU TYPE A — Rp 136.300</option>
+          <option value="CCTV Tipe B">CCTV ODU TYPE B — Rp 62.700</option>
+          <option value="CCTV Tipe C">CCTV ODU TYPE C — Rp 145.800</option>
+          <option value="CCTV Tipe D">CCTV ODU TYPE D — Rp 42.500</option>
+          <option value="NVR 8CH">NVR 8 CH — Rp 30.700</option>
+          <option value="NVR 16CH">NVR 16 CH — Rp 100.700</option>
+          <option value="NVR 32CH">NVR 32 CH — Rp 109.500</option>
+          <option value="HDD 4TB">HDD 4 TB — Rp 25.200</option>
+          <option value="MONITOR 32 INC">Monitor 32 Inc — Rp 63.200</option>
+          <option value="SWITCH 4PORT">SWITCH 4 PORT — Rp 36.200</option>
+          <option value="SWITCH 8PORT">SWITCH 8 PORT — Rp 55.800</option>
+          <option value="SWITCH 16PORT">SWITCH 16 PORT — Rp 79.800</option>
+          <option value="SWITCH 24PORT">SWITCH 24 PORT — Rp 103.300</option>
+          <option value="VMS">VIDEO MANAGEMENT SERVER — Rp 2.047.500</option>
+          <option value="WALL BRACKET">WALL BRACKET — Rp 404.700</option>
+          <option value="NVD 4CH">NVD 4CH — Rp 292.600</option>
+        </select>
+        <span class="err-msg" id="em-perangkat">Pilih perangkat</span>
+      </div>
+      <div class="form-group">
+        <label>PJ Gangguan</label>
+        <select id="m-pj"><option>LINTASARTA</option><option>PELANGGAN</option></select>
+      </div>
+      <div class="form-group fg-full">
+        <label>Problem / Indikasi <span class="req">*</span></label>
+        <select id="m-prob">
+          <option value="">— Pilih Kategori —</option>
+          <option>Reconfig / Restart / Reset Perangkat</option>
+          <option>Adaptor / PoE / Konverter Bermasalah</option>
+          <option>Radio / PTP / Link Wireless Bermasalah</option>
+          <option>Switch / LAN Lokal Rusak</option>
+          <option>Konektor / RJ45 / Kabel DC Rusak / Berkarat</option>
+          <option>Kabel / FO Cut / Patchcore Bermasalah</option>
+          <option>NVR / DVR / Recorder Bermasalah</option>
+          <option>Konfigurasi / Host / IP Error</option>
+          <option>Pergantian Perangkat / Replacement</option>
+          <option>Lainnya</option>
+        </select>
+        <span class="err-msg" id="em-prob">Pilih problem</span>
+      </div>
+      <div class="form-group fg-full">
+        <label>Keterangan</label>
+        <textarea id="m-ket" placeholder="Deskripsi detail gangguan..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-card">
+    <div class="manual-card-title">⏱ Waktu Gangguan</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>🔴 Tanggal &amp; Jam Mulai (Time In) <span class="req">*</span></label>
+        <input type="datetime-local" id="m-timein" onchange="updateManualPreview()"/>
+        <span class="err-msg" id="em-timein">Wajib diisi</span>
+      </div>
+      <div class="form-group" id="m-grp-timeout">
+        <label>🟢 Tanggal &amp; Jam Selesai (Time Close) <span class="req">*</span></label>
+        <input type="datetime-local" id="m-timeout" onchange="updateManualPreview()"/>
+        <span class="err-msg" id="em-timeout">Wajib diisi (harus setelah Time In)</span>
+      </div>
+      <div class="form-group" id="m-grp-hold">
+        <label>⏸ Total Waktu ON HOLD (menit)</label>
+        <input type="number" id="m-holdmin" placeholder="0" min="0" value="0" onchange="updateManualPreview()" style="font-family:'IBM Plex Mono',monospace"/>
+        <span style="font-size:10px;color:var(--muted);margin-top:3px">Isi jika ada periode ON HOLD. Kosongkan / isi 0 jika tidak ada.</span>
+      </div>
+      <div class="form-group" id="m-grp-sol">
+        <label>Solusi / Tindakan <span class="req">*</span></label>
+        <input type="text" id="m-sol" placeholder="Contoh: Pergantian kabel FO"/>
+        <span class="err-msg" id="em-sol">Wajib diisi</span>
+      </div>
+      <div class="form-group" id="m-grp-ganti">
+        <label>Ganti Perangkat?</label>
+        <select id="m-ganti"><option value="NO">Tidak</option><option value="YES">Ya</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-card" id="m-preview-card" style="display:none">
+    <div class="manual-card-title">📊 Preview Kalkulasi SLA</div>
+    <div class="sla-preview-grid" id="m-sla-grid"></div>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;padding-bottom:30px">
+    <button class="btn btn-ghost" onclick="resetManualForm()">🔄 Reset Form</button>
+    <button class="btn" id="m-submit-btn" style="background:var(--orange);color:#fff;font-size:13px;padding:10px 22px" onclick="submitManualTkt()">💾 Simpan Tiket Manual (CLOSE)</button>
+  </div>
+</div>
+
+</main>
+<footer style="text-align:center;padding:10px 20px;border-top:1px solid var(--bdr);font-size:10.5px;color:var(--muted);background:var(--s1);letter-spacing:.3px">
+  Pertamina EP — CCTV Helpdesk Ticketing System &nbsp;·&nbsp;
+  <span style="color:var(--blue)">Developed by Amudi Manurung</span>
+</footer>
+</div><!-- /app-shell -->
+
+<!-- ══════════ MODAL CREATE ══════════ -->
+<div class="overlay" id="m-create">
+<div class="modal">
+  <div class="modal-hdr">
+    <div><div class="modal-title">🚀 Buat Tiket Baru</div><div class="modal-sub" id="create-sub">Timer penanganan mulai berjalan otomatis setelah tiket dibuat</div></div>
+    <button class="close-btn" onclick="CM('m-create')">✕</button>
+  </div>
+  <div class="form-grid">
+    <div class="form-group fg-full">
+      <label>Nama Field <span class="req">*</span></label>
+      <div class="field-chips" id="fchips">
+        <div class="chip selected" onclick="selField(this)" data-v="PRABUMULIH">PRABUMULIH</div>
+        <div class="chip" onclick="selField(this)" data-v="PENDOPO">PENDOPO</div>
+        <div class="chip" onclick="selField(this)" data-v="RAMBA">RAMBA</div>
+        <div class="chip" onclick="selField(this)" data-v="LIMAU">LIMAU</div>
+        <div class="chip" onclick="selField(this)" data-v="ADERA">ADERA</div>
+        <div class="chip" onclick="selField(this)" data-v="JAMBI">JAMBI</div>
+        <div class="chip" onclick="selField(this)" data-v="PANGKALAN SUSU">PANGKALAN SUSU</div>
+        <div class="chip" onclick="selField(this)" data-v="LIRIK">LIRIK</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Nama Site <span class="req">*</span></label>
+      <input type="text" id="isite" placeholder="Contoh: SP BETUNG"/>
+      <span class="err-msg" id="esite">Wajib diisi</span>
+    </div>
+    <div class="form-group">
+      <label>Lokasi CCTV</label>
+      <input type="text" id="ilok" placeholder="Contoh: GERBANG MASUK"/>
+    </div>
+    <div class="form-group">
+      <label>Jenis Perangkat Terganggu <span class="req">*</span></label>
+      <select id="iperangkat">
+        <option value="">— Pilih Perangkat —</option>
+        <option value="CCTV Tipe A">CCTV ODU TYPE A (Tipe A) — Rp 136.300</option>
+        <option value="CCTV Tipe B">CCTV ODU TYPE B (Tipe B) — Rp 62.700</option>
+        <option value="CCTV Tipe C">CCTV ODU TYPE C — Rp 145.800</option>
+        <option value="CCTV Tipe D">CCTV ODU TYPE D — Rp 42.500</option>
+        <option value="NVR 8CH">NVR 8 CH 2 SATA — Rp 30.700</option>
+        <option value="NVR 16CH">NVR 16 CH 4 SATA — Rp 100.700</option>
+        <option value="NVR 32CH">NVR 32 CH 4 SATA — Rp 109.500</option>
+        <option value="HDD 4TB">HDD 4 TB — Rp 25.200</option>
+        <option value="MONITOR 32 INC">LED TV 32 LG / Monitor — Rp 63.200</option>
+        <option value="SWITCH 4PORT">SWITCH 4 PORT — Rp 36.200</option>
+        <option value="SWITCH 8PORT">SWITCH 8 PORT — Rp 55.800</option>
+        <option value="SWITCH 16PORT">SWITCH 16 PORT — Rp 79.800</option>
+        <option value="SWITCH 24PORT">SWITCH 24 PORT — Rp 103.300</option>
+        <option value="VMS">VIDEO MANAGEMENT SERVER — Rp 2.047.500</option>
+        <option value="WALL BRACKET">WALL BRACKET — Rp 404.700</option>
+        <option value="NVD 4CH">4CH NETWORK VIDEO DECODER — Rp 292.600</option>
+      </select>
+      <span class="err-msg" id="eperangkat">Pilih perangkat</span>
+    </div>
+    <div class="form-group">
+      <label>PJ Gangguan</label>
+      <select id="ipj"><option>LINTASARTA</option><option>PELANGGAN</option></select>
+    </div>
+    <div class="form-group fg-full">
+      <label>Indikasi Awal / Problem <span class="req">*</span></label>
+      <select id="iprob">
+        <option value="">— Pilih Kategori —</option>
+        <option>Reconfig / Restart / Reset Perangkat</option>
+        <option>Adaptor / PoE / Konverter Bermasalah</option>
+        <option>Radio / PTP / Link Wireless Bermasalah</option>
+        <option>Switch / LAN Lokal Rusak</option>
+        <option>Konektor / RJ45 / Kabel DC Rusak / Berkarat</option>
+        <option>Kabel / FO Cut / Patchcore Bermasalah</option>
+        <option>NVR / DVR / Recorder Bermasalah</option>
+        <option>Konfigurasi / Host / IP Error</option>
+        <option>Pergantian Perangkat / Replacement</option>
+        <option>Lainnya</option>
+      </select>
+      <span class="err-msg" id="eprob">Pilih indikasi problem</span>
+    </div>
+    <div class="form-group fg-full">
+      <label>Keterangan Tambahan</label>
+      <textarea id="iket" placeholder="Deskripsi detail gangguan..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Ganti Perangkat?</label>
+      <select id="iganti"><option value="NO">Tidak</option><option value="YES">Ya</option></select>
+    </div>
+  </div>
+  <div class="form-footer">
+    <button class="btn btn-ghost" onclick="CM('m-create')">Batal</button>
+    <button class="btn btn-primary" onclick="createTkt()">🚀 Buat Tiket &amp; Mulai Timer</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ MODAL DETAIL ══════════ -->
+<div class="overlay" id="m-detail">
+<div class="modal modal-lg">
+  <div class="modal-hdr">
+    <div><div class="modal-title" id="dt-title">Detail Tiket</div><div class="modal-sub" id="dt-sub"></div></div>
+    <button class="close-btn" onclick="CM('m-detail')">✕</button>
+  </div>
+  <div id="dt-holdbar" style="display:none" class="hold-bar">
+    <span style="font-size:16px">⏸</span>
+    <div style="flex:1"><span style="color:var(--yellow);font-weight:600">ON HOLD</span><span style="color:var(--muted);margin-left:8px;font-size:11px" id="dt-holdreason"></span></div>
+  </div>
+  <div class="detail-grid dg3">
+    <div class="detail-item"><div class="detail-lbl">Field</div><div class="detail-val" id="dt-field"></div></div>
+    <div class="detail-item"><div class="detail-lbl">Site</div><div class="detail-val" id="dt-site"></div></div>
+    <div class="detail-item"><div class="detail-lbl">Lokasi</div><div class="detail-val" id="dt-lok"></div></div>
+    <div class="detail-item"><div class="detail-lbl">Perangkat</div><div class="detail-val" id="dt-prkt"></div></div>
+    <div class="detail-item"><div class="detail-lbl">PJ Gangguan</div><div class="detail-val" id="dt-pj"></div></div>
+    <div class="detail-item"><div class="detail-lbl">Status</div><div class="detail-val" id="dt-status"></div></div>
+    <div class="detail-item"><div class="detail-lbl">Waktu Open</div><div class="detail-val" style="font-family:'IBM Plex Mono',monospace;font-size:11px" id="dt-tin"></div></div>
+    <div class="detail-item"><div class="detail-lbl">Waktu Close</div><div class="detail-val" style="font-family:'IBM Plex Mono',monospace;font-size:11px" id="dt-tout"></div></div>
+    <div class="detail-item"><div class="detail-lbl">⏱ Durasi Aktif</div><div id="dt-timer"></div></div>
+  </div>
+  <div class="detail-grid">
+    <div class="detail-item detail-full"><div class="detail-lbl">Problem / Indikasi</div><div class="detail-val" id="dt-prob"></div></div>
+    <div class="detail-item detail-full"><div class="detail-lbl">Keterangan</div><div class="detail-val" id="dt-ket"></div></div>
+  </div>
+  <div class="detail-grid dg3" id="dt-calc" style="display:none">
+    <div class="detail-item" style="border-color:rgba(6,182,212,.4)"><div class="detail-lbl" style="color:var(--cyan)">MTTR</div><div class="detail-val" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan)" id="dt-mttr"></div></div>
+    <div class="detail-item" style="border-color:rgba(245,158,11,.4)"><div class="detail-lbl" style="color:var(--yellow)">SLA</div><div id="dt-sla"></div></div>
+    <div class="detail-item" style="border-color:rgba(168,85,247,.4)"><div class="detail-lbl" style="color:var(--purple)">Tarif / Bulan</div><div class="detail-val" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--purple)" id="dt-tarif"></div></div>
+    <div class="detail-item" style="border-color:rgba(239,68,68,.4)"><div class="detail-lbl" style="color:var(--red)">Restitusi</div><div class="detail-val" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red)" id="dt-rest"></div></div>
+    <div class="detail-item" style="border-color:rgba(249,115,22,.4)"><div class="detail-lbl" style="color:var(--orange)">Denda</div><div class="detail-val" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--orange)" id="dt-denda"></div></div>
+    <div class="detail-item"><div class="detail-lbl">Ganti Perangkat</div><div class="detail-val" id="dt-ganti"></div></div>
+  </div>
+  <hr class="divider"/>
+  <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Timeline Penanganan</div>
+  <div class="timeline" id="dt-tl"></div>
+  <div class="form-footer" id="dt-acts"></div>
+</div>
+</div>
+
+<!-- ══════════ MODAL EDIT TIKET ══════════ -->
+<div class="overlay" id="m-edit">
+<div class="modal">
+  <div class="modal-hdr">
+    <div>
+      <div class="modal-title">✏️ Edit Tiket</div>
+      <div class="modal-sub" id="edit-sub">—</div>
+    </div>
+    <button class="close-btn" onclick="CM('m-edit')">✕</button>
+  </div>
+  <div class="form-grid">
+    <!-- Field -->
+    <div class="form-group fg-full">
+      <label>Nama Field <span class="req">*</span></label>
+      <div class="field-chips" id="edit-fchips">
+        <div class="chip" onclick="editSelField(this)" data-v="PRABUMULIH">PRABUMULIH</div>
+        <div class="chip" onclick="editSelField(this)" data-v="PENDOPO">PENDOPO</div>
+        <div class="chip" onclick="editSelField(this)" data-v="RAMBA">RAMBA</div>
+        <div class="chip" onclick="editSelField(this)" data-v="LIMAU">LIMAU</div>
+        <div class="chip" onclick="editSelField(this)" data-v="ADERA">ADERA</div>
+        <div class="chip" onclick="editSelField(this)" data-v="JAMBI">JAMBI</div>
+        <div class="chip" onclick="editSelField(this)" data-v="PANGKALAN SUSU">PANGKALAN SUSU</div>
+        <div class="chip" onclick="editSelField(this)" data-v="LIRIK">LIRIK</div>
+      </div>
+    </div>
+    <!-- Site & Lokasi -->
+    <div class="form-group">
+      <label>Nama Site <span class="req">*</span></label>
+      <input type="text" id="edit-site" placeholder="Contoh: SP BETUNG"/>
+      <span class="err-msg" id="eem-site">Wajib diisi</span>
+    </div>
+    <div class="form-group">
+      <label>Lokasi CCTV</label>
+      <input type="text" id="edit-lok" placeholder="Contoh: GERBANG MASUK"/>
+    </div>
+    <!-- Perangkat -->
+    <div class="form-group">
+      <label>Jenis Perangkat <span class="req">*</span></label>
+      <select id="edit-perangkat">
+        <option value="">— Pilih Perangkat —</option>
+        <option value="CCTV Tipe A">CCTV ODU TYPE A</option>
+        <option value="CCTV Tipe B">CCTV ODU TYPE B</option>
+        <option value="CCTV Tipe C">CCTV ODU TYPE C</option>
+        <option value="CCTV Tipe D">CCTV ODU TYPE D</option>
+        <option value="NVR 8CH">NVR 8 CH</option>
+        <option value="NVR 16CH">NVR 16 CH</option>
+        <option value="NVR 32CH">NVR 32 CH</option>
+        <option value="HDD 4TB">HDD 4 TB</option>
+        <option value="MONITOR 32 INC">Monitor 32 Inc</option>
+        <option value="SWITCH 4PORT">SWITCH 4 PORT</option>
+        <option value="SWITCH 8PORT">SWITCH 8 PORT</option>
+        <option value="SWITCH 16PORT">SWITCH 16 PORT</option>
+        <option value="SWITCH 24PORT">SWITCH 24 PORT</option>
+        <option value="VMS">VIDEO MANAGEMENT SERVER</option>
+        <option value="WALL BRACKET">WALL BRACKET</option>
+        <option value="NVD 4CH">NVD 4CH</option>
+      </select>
+      <span class="err-msg" id="eem-perangkat">Pilih perangkat</span>
+    </div>
+    <!-- PJ -->
+    <div class="form-group">
+      <label>PJ Gangguan</label>
+      <select id="edit-pj">
+        <option>LINTASARTA</option>
+        <option>PELANGGAN</option>
+      </select>
+    </div>
+    <!-- Problem -->
+    <div class="form-group fg-full">
+      <label>Problem / Indikasi <span class="req">*</span></label>
+      <select id="edit-prob">
+        <option value="">— Pilih Kategori —</option>
+        <option>Reconfig / Restart / Reset Perangkat</option>
+        <option>Adaptor / PoE / Konverter Bermasalah</option>
+        <option>Radio / PTP / Link Wireless Bermasalah</option>
+        <option>Switch / LAN Lokal Rusak</option>
+        <option>Konektor / RJ45 / Kabel DC Rusak / Berkarat</option>
+        <option>Kabel / FO Cut / Patchcore Bermasalah</option>
+        <option>NVR / DVR / Recorder Bermasalah</option>
+        <option>Konfigurasi / Host / IP Error</option>
+        <option>Pergantian Perangkat / Replacement</option>
+        <option>Lainnya</option>
+      </select>
+      <span class="err-msg" id="eem-prob">Pilih problem</span>
+    </div>
+    <!-- Keterangan -->
+    <div class="form-group fg-full">
+      <label>Keterangan</label>
+      <textarea id="edit-ket" placeholder="Deskripsi detail gangguan..."></textarea>
+    </div>
+    <!-- Ganti Perangkat -->
+    <div class="form-group">
+      <label>Ganti Perangkat?</label>
+      <select id="edit-ganti">
+        <option value="NO">Tidak</option>
+        <option value="YES">Ya</option>
+      </select>
+    </div>
+  </div>
+  <!-- Waktu Open & Close — CO1 only -->
+  <div id="edit-time-section" style="display:none">
+    <div style="margin:16px 0 10px;padding:12px 14px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:8px;font-size:11px;color:#fcd34d">
+      ⚠️ Edit waktu hanya untuk CO1. Perubahan waktu akan mempengaruhi kalkulasi SLA, Restitusi, dan Denda.
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>🔴 Waktu Open (Time In)</label>
+        <input type="datetime-local" id="edit-timein" style="font-family:'IBM Plex Mono',monospace"/>
+      </div>
+      <div class="form-group" id="edit-grp-timeout">
+        <label>🟢 Waktu Close (Time Out)</label>
+        <input type="datetime-local" id="edit-timeout" style="font-family:'IBM Plex Mono',monospace"/>
+      </div>
+    </div>
+  </div>
+  <div class="form-footer">
+    <button class="btn btn-ghost" onclick="CM('m-edit')">Batal</button>
+    <button class="btn btn-primary" onclick="saveEdit()">💾 Simpan Perubahan</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ MODAL ON HOLD ══════════ -->
+<div class="overlay" id="m-hold">
+<div class="modal" style="width:480px">
+  <div class="modal-hdr">
+    <div><div class="modal-title">⏸ ON HOLD — Hentikan Timer</div><div class="modal-sub">Wajib isi justifikasi sebelum menahan tiket</div></div>
+    <button class="close-btn" onclick="CM('m-hold')">✕</button>
+  </div>
+  <div class="form-group" style="margin-bottom:14px">
+    <label>Justifikasi ON HOLD <span class="req">*</span></label>
+    <textarea id="ihold" placeholder="Contoh: Menunggu spare part dari gudang pusat, estimasi 3 hari..." style="min-height:100px"></textarea>
+    <span class="err-msg" id="ehold">Justifikasi wajib diisi</span>
+  </div>
+  <div class="form-footer">
+    <button class="btn btn-ghost" onclick="CM('m-hold')">Batal</button>
+    <button class="btn btn-yellow" onclick="doHold()">⏸ Konfirmasi ON HOLD</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ MODAL CLOSE ══════════ -->
+<div class="overlay" id="m-close">
+<div class="modal" style="width:500px">
+  <div class="modal-hdr">
+    <div><div class="modal-title">✅ Tutup Tiket</div><div class="modal-sub">Konfirmasi penyelesaian gangguan</div></div>
+    <button class="close-btn" onclick="CM('m-close')">✕</button>
+  </div>
+  <div class="form-group" style="margin-bottom:12px">
+    <label>Solusi / Tindakan <span class="req">*</span></label>
+    <textarea id="isol" placeholder="Deskripsi solusi yang telah dilakukan..." style="min-height:90px"></textarea>
+    <span class="err-msg" id="esol">Solusi wajib diisi</span>
+  </div>
+  <div class="form-group" style="margin-bottom:12px">
+    <label>Ganti Perangkat?</label>
+    <select id="icloseganti"><option value="NO">Tidak</option><option value="YES">Ya</option></select>
+  </div>
+  <div id="close-preview" style="background:var(--s2);border-radius:7px;padding:12px;font-size:12px;margin-bottom:4px;border:1px solid var(--bdr)"></div>
+  <div class="form-footer">
+    <button class="btn btn-ghost" onclick="CM('m-close')">Batal</button>
+    <button class="btn btn-green" onclick="doClose()">✅ Tutup Tiket</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL DELETE (CO1 ONLY) ══ -->
+<div class="overlay" id="m-delete">
+<div class="modal" style="width:440px">
+  <div class="modal-hdr">
+    <div>
+      <div class="modal-title" style="color:var(--red)">🗑 Hapus Tiket</div>
+      <div class="modal-sub">Tindakan ini tidak dapat dibatalkan</div>
+    </div>
+    <button class="close-btn" onclick="CM('m-delete')">✕</button>
+  </div>
+  <div style="background:var(--red-bg);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--red)">
+    ⚠️ <strong>Peringatan:</strong> Tiket yang dihapus tidak dapat dikembalikan. Pastikan Anda yakin.
+  </div>
+  <div style="background:var(--s2);border-radius:7px;padding:14px;margin-bottom:4px;border:1px solid var(--bdr)">
+    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Tiket yang akan dihapus</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:var(--blue);margin-bottom:3px" id="del-prev-id"></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px" id="del-prev-info"></div>
+    <div id="del-prev-status"></div>
+  </div>
+  <div class="form-footer">
+    <button class="btn btn-ghost" onclick="CM('m-delete')">Batal</button>
+    <button class="btn" style="background:var(--red);color:#fff" onclick="confirmDelete()">🗑 Ya, Hapus Tiket</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"><span id="ti">✓</span><span id="tm">OK</span></div>
+
+<!-- Firebase SDK — Primary: jsDelivr, Fallback: unpkg -->
+<script>
+(function(){
+  // Coba load Firebase dari 3 CDN berbeda secara berurutan
+  var SDKS = [
+    ['https://cdn.jsdelivr.net/npm/firebase@9.22.2/firebase-app-compat.min.js',
+     'https://cdn.jsdelivr.net/npm/firebase@9.22.2/firebase-database-compat.min.js'],
+    ['https://unpkg.com/firebase@9.22.2/firebase-app-compat.js',
+     'https://unpkg.com/firebase@9.22.2/firebase-database-compat.js'],
+    ['https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js',
+     'https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js'],
+  ];
+  window._fbCdnIdx = 0;
+  function loadSDK(idx){
+    if(idx >= SDKS.length){
+      window._fbLoadFailed = true;
+      return;
+    }
+    var s1 = document.createElement('script');
+    s1.src = SDKS[idx][0];
+    s1.onerror = function(){ loadSDK(idx+1); };
+    s1.onload = function(){
+      var s2 = document.createElement('script');
+      s2.src = SDKS[idx][1];
+      s2.onerror = function(){ loadSDK(idx+1); };
+      s2.onload = function(){ window._fbLoaded = true; };
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s1);
+  }
+  loadSDK(0);
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════
+// ACCOUNTS DATABASE
+// ═══════════════════════════════════════════════════
+const ACCOUNTS = [
+  {username:'CO1', password:'P4ssword', name:'CO1', role:'Helpdesk', canDelete:true,  viewOnly:false, color:'#ef4444', abbr:'C1'},
+  {username:'CO2', password:'P4ssword', name:'CO2', role:'Helpdesk', canDelete:false, viewOnly:false, color:'#3b82f6', abbr:'C2'},
+  {username:'CO3', password:'P4ssword', name:'CO3', role:'Helpdesk', canDelete:false, viewOnly:false, color:'#22c55e', abbr:'C3'},
+  {username:'CO4', password:'P4ssword', name:'CO4', role:'Helpdesk', canDelete:false, viewOnly:false, color:'#a855f7', abbr:'C4'},
+  {username:'VIEW', password:'V1ewOnly', name:'VIEW', role:'View Only', canDelete:false, viewOnly:true, color:'#f59e0b', abbr:'VW'},
+];
+const USER_COL = {
+  CO1:{bg:'rgba(239,68,68,.18)',  fg:'#ef4444'},
+  CO2:{bg:'rgba(59,130,246,.18)', fg:'#3b82f6'},
+  CO3:{bg:'rgba(34,197,94,.18)',  fg:'#22c55e'},
+  CO4:{bg:'rgba(168,85,247,.18)', fg:'#a855f7'},
+  VIEW:{bg:'rgba(245,158,11,.18)', fg:'#f59e0b'},
+};
+function uLabel(n){
+  const k=USER_COL[n]||{bg:'rgba(100,116,139,.18)',fg:'#94a3b8'};
+  return `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${k.bg};color:${k.fg}">👤 ${n||'—'}</span>`;
+}
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const TARIF = {
+  'CCTV Tipe A':136300,'CCTV Tipe B':62700,'CCTV Tipe C':145800,'CCTV Tipe D':42500,
+  'NVR 8CH':30700,'NVR 16CH':100700,'NVR 32CH':109500,'HDD 4TB':25200,
+  'MONITOR 32 INC':63200,'SWITCH 4PORT':36200,'SWITCH 8PORT':55800,'SWITCH 16PORT':79800,
+  'SWITCH 24PORT':103300,'VMS':2047500,'WALL BRACKET':404700,'NVD 4CH':292600
+};
+const MBL = 43200;
+const MONTHS = ['','JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','SEP','OKT','NOV','DES'];
+
+// ── FIREBASE CONFIG ── (ISI SESUAI PROJECT ANDA) ──────────────────────
+const FB_CONFIG = {
+  apiKey:            "AIzaSyBay7ZRRYjHlvMFgDx6_p77Oi7FGsIpOGM",
+  authDomain:        "pertamina-cctv-ticketing.firebaseapp.com",
+  databaseURL:       "https://pertamina-cctv-ticketing-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "pertamina-cctv-ticketing",
+  storageBucket:     "pertamina-cctv-ticketing.firebasestorage.app",
+  messagingSenderId: "818696749647",
+  appId:             "1:818696749647:web:14e4a7e382832b0604203a"
+};
+// Tunggu Firebase SDK selesai dimuat (max 15 detik)
+function waitForFirebase(cb, attempt){
+  attempt = attempt || 0;
+  if(typeof firebase !== 'undefined' && window._fbLoaded){
+    try { firebase.initializeApp(FB_CONFIG); } catch(e) { if(!e.message.includes('already exists')) throw e; }
+    cb(firebase.database());
+  } else if(window._fbLoadFailed || attempt > 150){
+    // Semua CDN gagal
+    document.body.style.cssText='margin:0';
+    document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#0b0f1a;gap:16px;font-family:sans-serif;padding:20px">'
+      + '<div style="font-size:48px">⚠️</div>'
+      + '<div style="color:#ef4444;font-size:18px;font-weight:700;text-align:center">Firebase SDK Tidak Dapat Dimuat</div>'
+      + '<div style="color:#6b7d99;font-size:13px;text-align:center;max-width:420px;line-height:1.7">'
+      + 'Browser tidak dapat mengunduh library Firebase dari internet.<br><br>'
+      + '<strong style="color:#dde4f0">Kemungkinan penyebab:</strong><br>'
+      + '• Koneksi internet terputus<br>'
+      + '• Firewall/proxy kantor memblokir CDN<br>'
+      + '• Belum ada koneksi internet aktif'
+      + '</div>'
+      + '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'
+      + '<button onclick="location.reload()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer">🔄 Coba Lagi</button>'
+      + '</div>'
+      + '<div style="color:#4a5a75;font-size:11px;text-align:center;margin-top:8px">Jika masalah berlanjut, hubungi admin IT untuk membuka akses ke:<br>'
+      + 'cdn.jsdelivr.net &nbsp;|&nbsp; unpkg.com &nbsp;|&nbsp; gstatic.com</div>'
+      + '</div>';
+  } else {
+    setTimeout(function(){ waitForFirebase(cb, attempt+1); }, 100);
+  }
+}
+var db;
+waitForFirebase(function(database){ db = database; initLoginPage(); });
+// Return early — initLoginPage() dipanggil dari callback di atas
+var _fbInitDone = true;
+
+// ── STATE ───────────────────────────────────────────────────────────────
+let tickets  = [];
+let monthCtr = {};
+let curUser  = null;
+let fbReady  = false;
+let selF     = 'PRABUMULIH';
+let actId    = null;
+let ftab     = 'all';
+let detIv    = null;
+let selMonths = new Set(); // empty = all
+
+// Sentinel: Firebase menghapus null values, ganti dengan string khusus
+function nullSafe(obj){
+  return JSON.parse(JSON.stringify(obj, function(k,v){ return v===null ? '__NULL__' : v; }));
+}
+function nullRestore(obj){
+  return JSON.parse(JSON.stringify(obj, function(k,v){ return v==='__NULL__' ? null : v; }));
+}
+var _saveTs = 0; // timestamp terakhir save, untuk guard race condition
+
+function save(changedTicket){
+  _saveTs = Date.now();
+  if(changedTicket){
+    var safeId = changedTicket.id.replace(/-/g,'_');
+    db.ref('tickets/' + safeId).set(nullSafe(changedTicket));
+  } else {
+    var obj = {};
+    tickets.forEach(function(t){ obj[t.id.replace(/-/g,'_')] = nullSafe(t); });
+    if(Object.keys(obj).length === 0){ db.ref('tickets').remove(); }
+    else { db.ref('tickets').set(obj); }
+  }
+  // Bersihkan key NaN sebelum save
+  var cleanCtr = {};
+  Object.keys(monthCtr).forEach(function(k){
+    if(!k.includes('NaN') && !k.includes('undefined')) cleanCtr[k] = monthCtr[k];
+  });
+  db.ref('monthCtr').set(cleanCtr);
+}
+
+// ═══════════════════════════════════════════════════
+// TICKET ID: YYYY-MM-NNNN
+// ═══════════════════════════════════════════════════
+function genId(){
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm   = String(now.getMonth()+1).padStart(2,'0');
+  if(isNaN(yyyy) || isNaN(now.getMonth())) return null; // guard NaN
+  const key  = `${yyyy}-${mm}`;
+  monthCtr[key] = (monthCtr[key] || 0) + 1;
+  const seq  = String(monthCtr[key]).padStart(4,'0');
+  save();
+  return `${yyyy}-${mm}-${seq}`;
+}
+
+// ═══════════════════════════════════════════════════
+// LOGIN / LOGOUT
+// ═══════════════════════════════════════════════════
+function initLoginPage(){
+  showLoadingScreen(true, 'Menghubungkan ke Database...');
+
+  // Timeout 10 detik — jika tidak ada respon dari Firebase
+  var connTimeout = setTimeout(function(){
+    showFbError(
+      'Koneksi ke Firebase timeout (10 detik).<br><br>' +
+      '<strong style="color:#dde4f0">Kemungkinan penyebab:</strong><br>' +
+      '① <strong>databaseURL</strong> salah — pastikan formatnya:<br>' +
+      '<code style="font-size:10px;color:#06b6d4">https://PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app</code><br><br>' +
+      '② <strong>Firebase Rules</strong> belum diatur — buka Firebase Console → Realtime Database → Rules, pastikan isinya:<br>' +
+      '<code style="font-size:10px;color:#22c55e">{ "rules": { ".read": true, ".write": true } }</code><br><br>' +
+      '③ <strong>Firewall/proxy</strong> memblokir koneksi ke firebaseio.com atau firebasedatabase.app'
+    );
+  }, 10000);
+
+  db.ref('/').once('value').then(function(snap){
+    clearTimeout(connTimeout);
+    var data = snap.val() || {};
+    if(!data.tickets){
+      tickets = [];
+    } else {
+      var arr = Object.values(data.tickets).map(nullRestore).filter(function(t){ return t && t.id; });
+      arr.sort(function(a,b){ return (b.openTime||0)-(a.openTime||0); });
+      tickets = arr;
+    }
+    monthCtr = data.monthCtr || {};
+    fbReady  = true;
+    showLoadingScreen(false);
+
+    // ── MIGRATION: pindahkan tiket key-dash ke key-underscore ──────────
+    db.ref('tickets').once('value').then(function(migrSnap){
+      var migrData = migrSnap.val()||{};
+      var toMigrate = Object.entries(migrData).filter(function(e){ return e[0].includes('-'); });
+      if(toMigrate.length > 0){
+        var updates = {};
+        toMigrate.forEach(function(e){
+          var oldKey = e[0];
+          var newKey = oldKey.replace(/-/g,'_');
+          // Hanya migrate jika key underscore belum ada
+          if(!migrData[newKey]){
+            updates['tickets/'+newKey] = e[1];
+          }
+          updates['tickets/'+oldKey] = null; // hapus key lama
+        });
+        db.ref().update(updates).then(function(){
+          console.log('[MIGRATION] Selesai: '+toMigrate.length+' tiket dipindahkan ke format underscore');
+        });
+      }
+      // Bersihkan NaN-NaN di monthCtr
+      db.ref('monthCtr/NaN-NaN').remove();
+    });
+
+    // Realtime listener
+    db.ref('tickets').on('value', function(snap2){
+      if(Date.now() - _saveTs < 3000){ return; } // skip jika baru save (race condition guard)
+      var raw = snap2.val();
+      if(raw === null){
+        tickets = [];
+      } else {
+        var arr2 = Object.values(raw).map(nullRestore).filter(function(t){ return t && t.id; });
+        arr2.sort(function(a,b){ return (b.openTime||0)-(a.openTime||0); });
+        tickets = arr2;
+      }
+      if(curUser){
+        renderDash();
+        if(document.getElementById('page-tiket').classList.contains('active')) renderAll();
+        if(document.getElementById('page-laporan').classList.contains('active')) renderRpt();
+      }
+    });
+
+    var sess = localStorage.getItem('nc_session');
+    if(sess){ curUser = JSON.parse(sess); showApp(); }
+
+  }).catch(function(err){
+    clearTimeout(connTimeout);
+    showLoadingScreen(false);
+    var msg = err.message || 'Unknown error';
+    var hint = '';
+    if(msg.indexOf('permission') !== -1 || msg.indexOf('PERMISSION') !== -1){
+      hint = '<br><br>⚠️ <strong>Error: Permission Denied</strong><br>Firebase Rules Anda tidak mengizinkan akses. Buka Firebase Console → Realtime Database → Rules → ubah ke:<br><code style="font-size:10px;color:#22c55e">{ "rules": { ".read": true, ".write": true } }</code> → klik Publish';
+    } else if(msg.indexOf('network') !== -1 || msg.indexOf('fetch') !== -1){
+      hint = '<br><br>⚠️ Masalah jaringan — periksa koneksi internet Anda';
+    }
+    showFbError(msg + hint);
+  });
+}
+
+function showLoadingScreen(show, msg){
+  var el = document.getElementById('fb-loading');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'fb-loading';
+    el.style.cssText = 'position:fixed;inset:0;background:#0b0f1a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:IBM Plex Sans,sans-serif';
+    document.body.appendChild(el);
+  }
+  if(show){
+    el.innerHTML = '<div style="width:52px;height:52px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:26px;animation:spin 1.5s linear infinite">📡</div>'
+      + '<div style="font-size:14px;font-weight:600;color:#dde4f0">'+(msg||'Memuat...')+'</div>'
+      + '<div style="font-size:11px;color:#6b7d99">Harap tunggu sebentar</div>';
+    el.style.display = 'flex';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function showFbError(msg){
+  let el = document.getElementById('fb-loading');
+  if(!el){ el = document.createElement('div'); el.id='fb-loading'; document.body.appendChild(el); }
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px';
+  el.innerHTML = '<div style="font-size:36px">⚠️</div>'
+    + '<div style="font-size:15px;font-weight:700;color:var(--red)">Gagal Terhubung ke Firebase</div>'
+    + '<div style="font-size:12px;color:var(--muted);max-width:360px;text-align:center;padding:0 20px">'+msg+'</div>'
+    + '<div style="font-size:11px;color:var(--muted);text-align:center;padding:0 20px">Pastikan Firebase Config sudah diisi dan Rules sudah diatur</div>'
+    + '<button onclick="location.reload()" style="margin-top:6px;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">🔄 Coba Lagi</button>';
+  el.style.display = 'flex';
+}
+function togglePw(){
+  const inp = document.getElementById('inp-pass');
+  const btn = document.getElementById('pw-eye-btn');
+  if(inp.type==='password'){ inp.type='text'; btn.textContent='🙈'; }
+  else { inp.type='password'; btn.textContent='👁'; }
+}
+
+function doLogin(){
+  const u = document.getElementById('inp-user').value.trim();
+  const p = document.getElementById('inp-pass').value;
+  const acc = ACCOUNTS.find(a => a.username === u && a.password === p);
+  if(!acc){
+    document.getElementById('login-err').classList.add('show');
+    document.getElementById('inp-pass').value = '';
+    return;
+  }
+  document.getElementById('login-err').classList.remove('show');
+  curUser = acc;
+  localStorage.setItem('nc_session', JSON.stringify(acc));
+  showApp();
+}
+
+function showApp(){
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('app-shell').style.display='block';
+  document.getElementById('nav-uname').textContent = curUser.name;
+  document.getElementById('nav-role').textContent  = curUser.viewOnly ? 'View Only' : (curUser.canDelete ? 'Helpdesk (Admin)' : 'Helpdesk');
+  const av = document.getElementById('nav-avatar');
+  av.textContent      = curUser.abbr;
+  av.style.background = (USER_COL[curUser.name]||{bg:'rgba(100,116,139,.18)'}).bg;
+  av.style.color      = curUser.color;
+  document.getElementById('create-sub').textContent =
+    'Input oleh: '+curUser.name+' — Timer mulai otomatis setelah tiket dibuat';
+  // Tampilkan / sembunyikan tab sesuai role
+  var tabManual = document.getElementById('tab-manual');
+  var tabTiket  = document.getElementById('tab-tiket');
+  var tabLaporan= document.getElementById('tab-laporan');
+  var btnCreate = document.getElementById('btn-create');
+  if(tabManual)  tabManual.style.display  = curUser.canDelete  ? 'inline-block' : 'none';
+  if(tabTiket)   tabTiket.style.display   = curUser.viewOnly   ? 'none' : 'inline-block';
+  if(tabLaporan) tabLaporan.style.display = curUser.viewOnly   ? 'none' : 'inline-block';
+  if(btnCreate)  btnCreate.style.display  = curUser.viewOnly   ? 'none' : '';
+  // Sync mobile drawer tabs
+  var mobManual  = document.getElementById('mob-tab-manual');
+  var mobTiket   = document.getElementById('mob-tab-tiket');
+  var mobLaporan = document.getElementById('mob-tab-laporan');
+  if(mobManual)  mobManual.style.display  = curUser.canDelete  ? '' : 'none';
+  if(mobTiket)   mobTiket.style.display   = curUser.viewOnly   ? 'none' : '';
+  if(mobLaporan) mobLaporan.style.display = curUser.viewOnly   ? 'none' : '';
+  // VIEW only: paksa ke dashboard
+  if(curUser.viewOnly) showPage('dashboard');
+  else renderDash();
+}
+
+function doLogout(){
+  localStorage.removeItem('nc_session');
+  curUser = null;
+  document.getElementById('app-shell').style.display  = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pass').value = '';
+}
+
+// ═══════════════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════════════
+setInterval(()=>{
+  const el = document.getElementById('clock');
+  if(el) el.textContent = new Date().toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+},1000);
+
+function toggleMobileNav(){
+  document.getElementById('mob-drawer').classList.toggle('open');
+  document.getElementById('mob-overlay').classList.toggle('show');
+}
+function closeMobileNav(){
+  document.getElementById('mob-drawer').classList.remove('open');
+  document.getElementById('mob-overlay').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════
+function showPage(p){
+  // Guard: viewOnly hanya boleh akses dashboard
+  if(curUser?.viewOnly && p !== 'dashboard'){ toast('🚫','Akun View Only hanya dapat melihat Dashboard'); return; }
+  // Guard: halaman manual hanya untuk CO1
+  if(p==='manual' && !curUser?.canDelete){ toast('🚫','Hanya CO1 yang bisa akses Input Manual'); return; }
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.mob-ntab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  ['dashboard','tiket','laporan','manual'].forEach((n,i)=>{
+    const tabs = document.querySelectorAll('.ntab');
+    if(n===p && tabs[i]) tabs[i].classList.add('active');
+    const mobTab = document.getElementById('mob-tab-'+n);
+    if(n===p && mobTab) mobTab.classList.add('active');
+  });
+  closeMobileNav();
+  if(p==='dashboard') renderDash();
+  if(p==='tiket')     renderAll();
+  if(p==='laporan')   renderRpt();
+  if(p==='manual')    renderManual();
+}
+
+// ═══════════════════════════════════════════════════
+// CALC SLA / RESTITUSI / DENDA
+// ═══════════════════════════════════════════════════
+function calc(t){
+  const tarif   = TARIF[t.perangkat] || 136300;
+  const now     = Date.now();
+  const closeT  = t.closeTime || now;
+  const totalMs = closeT - t.openTime;
+
+  // t_n = durasi penuh tiket (termasuk ON HOLD), dalam menit
+  const totalMins = totalMs / 60000;
+
+  // MTTR aktif (untuk SLA display saja)
+  let holdMins = 0;
+  (t.holds||[]).forEach(h=>{
+    const isActive = !h.resumeTime || h.resumeTime==='__NULL__';
+    const end      = isActive ? now : h.resumeTime;
+    holdMins += (end - h.holdTime) / 60000;
+  });
+  const mttr = Math.max(0, totalMins - holdMins);
+
+  // MBL calendar-based sesuai bulan tiket dibuka
+  const dOpen = new Date(t.openTime);
+  const daysInMonth = new Date(dOpen.getFullYear(), dOpen.getMonth()+1, 0).getDate();
+  const mbl = daysInMonth * 24 * 60;
+
+  // SLA = 1 - (MTTR_aktif / MBL) — untuk display
+  const sla = Math.max(0, Math.min(1, 1 - (mttr / mbl)));
+
+  // ── RESTITUSI (Rumus Kontrak B.1) ──────────────────────────────────────
+  // Batas MTTR: 120 menit tanpa ganti, 2880 menit dengan ganti perangkat
+  const batasMTTR = (t.gantiPerangkat === 'YES') ? 2880 : 120;
+  const efektif   = Math.max(0, totalMins - batasMTTR);
+  const restitusi = efektif * tarif / mbl;
+
+  // ── DENDA (Rumus Kontrak B.2) ───────────────────────────────────────────
+  // Denda jika total downtime tiket > 720 menit (12 jam)
+  const dendaBase = Math.max(0, totalMins - 720);
+  const denda     = dendaBase * tarif * 2 / mbl;
+
+  return {tarif, totalMins, holdMins, mttr, sla, mbl, batasMTTR, efektif, restitusi, denda};
+}
+
+function liveMins(t){
+  const now=Date.now(); const closeT=t.closeTime||now;
+  let holdMs=0;
+  (t.holds||[]).forEach(function(h){
+    // resumeTime bisa null, undefined, atau '__NULL__' (sentinel Firebase)
+    const isActive = !h.resumeTime || h.resumeTime==='__NULL__';
+    const end = isActive ? now : h.resumeTime;
+    holdMs += (end - h.holdTime);
+  });
+  return Math.max(0,(closeT-t.openTime-holdMs)/60000);
+}
+
+// ═══════════════════════════════════════════════════
+// FORMAT HELPERS
+// ═══════════════════════════════════════════════════
+function fDT(ts){
+  if(!ts) return '—';
+  return new Date(ts).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function fDur(m){
+  m=Math.max(0,m);
+  const d=Math.floor(m/1440),h=Math.floor(m%1440/60),mn=Math.floor(m%60);
+  const sc=Math.floor((m%1)*60);
+  if(d>0) return `${d}h ${h}j ${mn}m`;
+  if(h>0) return `${h}j ${mn}m ${sc}d`;
+  return `${mn}m ${sc}d`;
+}
+function fMon(n){return 'Rp '+Math.abs(n).toLocaleString('id-ID',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function fPct(n){return (n*100).toFixed(2)+'%';}
+function sBadge(s){
+  const m={'OPEN':'b-open','ON HOLD':'b-hold','CLOSE':'b-close'};
+  return `<span class="badge ${m[s]||'b-close'}"><span class="badge-dot"></span>${s}</span>`;
+}
+function slaBadge(v){
+  const p=v*100;
+  if(p>=95) return `<span class="badge b-sla-ok">${fPct(v)}</span>`;
+  if(p>=80) return `<span class="badge b-sla-warn">${fPct(v)}</span>`;
+  return `<span class="badge b-sla-fail">${fPct(v)}</span>`;
+}
+function getMonth(ts){ return new Date(ts).getMonth()+1; }
+function getYear(ts){ return new Date(ts).getFullYear(); }
+
+// ═══════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════
+function renderDash(){
+  const open=tickets.filter(x=>x.status==='OPEN').length;
+  const hold=tickets.filter(x=>x.status==='ON HOLD').length;
+  const cls=tickets.filter(x=>x.status==='CLOSE').length;
+  const n=tickets.length;
+  const avgS=n?tickets.reduce((a,t)=>a+calc(t).sla,0)/n:1;
+  const sC=avgS>=.95?'green':avgS>=.8?'yellow':'red';
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="stat blue"><div class="stat-label">Total Tiket</div><div class="stat-val">${n}</div><div class="stat-sub">Semua waktu</div></div>
+    <div class="stat green"><div class="stat-label">Open</div><div class="stat-val">${open}</div><div class="stat-sub">Timer berjalan</div></div>
+    <div class="stat yellow"><div class="stat-label">On Hold</div><div class="stat-val">${hold}</div><div class="stat-sub">Timer ditahan</div></div>
+    <div class="stat purple"><div class="stat-label">Closed</div><div class="stat-val">${cls}</div><div class="stat-sub">Selesai</div></div>
+    <div class="stat ${sC}"><div class="stat-label">Avg SLA</div><div class="stat-val">${(avgS*100).toFixed(1)}%</div><div class="stat-sub">Target ≥ 95%</div></div>`;
+  const fields=['PRABUMULIH','PENDOPO','RAMBA','LIMAU','ADERA','JAMBI','PANGKALAN SUSU','LIRIK'];
+  document.getElementById('sla-bars').innerHTML=fields.map(f=>{
+    const ft=tickets.filter(x=>x.field===f);
+    if(!ft.length) return`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>${f}</span><span style="color:var(--muted2)">No data</span></div><div class="progress-wrap"><div class="progress-fill" style="width:100%;background:var(--bdr2)"></div></div></div>`;
+    const av=ft.reduce((a,t)=>a+calc(t).sla,0)/ft.length;
+    const cl=av>=.95?'var(--green)':av>=.8?'var(--yellow)':'var(--red)';
+    return`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>${f} <span style="color:var(--muted2)">(${ft.length})</span></span><span style="color:${cl};font-family:'IBM Plex Mono',monospace">${fPct(av)}</span></div><div class="progress-wrap"><div class="progress-fill" style="width:${Math.min(100,av*100)}%;background:${cl}"></div></div></div>`;
+  }).join('');
+  const rec=[...tickets].sort((a,b)=>{const la=a.timeline?.slice(-1)[0]?.ts||0,lb=b.timeline?.slice(-1)[0]?.ts||0;return lb-la;}).slice(0,6);
+  document.getElementById('recent-act').innerHTML=rec.length
+    ?rec.map(t=>{const last=t.timeline?.slice(-1)[0];return`<div style="padding:9px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;cursor:pointer" onclick="openDetail('${t.id}')"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500">${t.id} — ${t.field}</div><div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${last?.text||'—'}</div></div>${sBadge(t.status)}</div>`;}).join('')
+    :'<div style="padding:30px;text-align:center;color:var(--muted);font-size:12px">Belum ada aktivitas</div>';
+  renderTblInto('active-tbl', tickets.filter(x=>x.status!=='CLOSE'), true);
+}
+
+// ═══════════════════════════════════════════════════
+// TABLE RENDER
+// ═══════════════════════════════════════════════════
+function renderTblInto(id, list, live=false){
+  const el=document.getElementById(id);
+  if(!list.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Tidak ada tiket</div><div>Klik "+ Create Tiket" untuk mulai</div></div>';
+    return;
+  }
+  el.innerHTML='<div class="tbl-scroll"><table><thead><tr><th>ID Tiket</th><th>Field</th><th>Site</th><th>Perangkat</th><th>Problem</th><th>Input Oleh</th><th>Time In</th><th>Durasi / Time Close</th><th>Status</th><th>SLA</th></tr></thead><tbody>'+
+    list.map(t=>{
+      const c=calc(t);const dur=liveMins(t);
+      return`<tr onclick="openDetail('${t.id}')">
+        <td class="td-mono" style="color:var(--blue);font-weight:600">${t.id}</td>
+        <td><span class="badge" style="background:var(--blue-bg);color:var(--blue);font-size:10px">${t.field}</span></td>
+        <td>${t.site||'—'}</td>
+        <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.perangkat}</td>
+        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)">${t.problem||'—'}</td>
+                <td>${uLabel(t.createdBy)}</td>
+        <td class="td-mono">${fDT(t.openTime)}</td>
+        <td>${(live && t.status!=='CLOSE')?`<span class="timer-chip ${t.status==='ON HOLD'?'hold':'running'}" data-tid="${t.id}">${fDur(dur)}</span>`:(t.closeTime?fDT(t.closeTime):'<span style="color:var(--muted)">—</span>')}</td>
+        <td>${sBadge(t.status)}</td>
+        <td>${t.status==='CLOSE'?slaBadge(c.sla):'—'}</td>
+      </tr>`;
+    }).join('')+'</tbody></table></div>';
+}
+
+function renderAll(){
+  const q=(document.getElementById('srch')?.value||'').toLowerCase();
+  const ff2=document.getElementById('ff')?.value||'';
+  const fs2=document.getElementById('fs')?.value||'';
+  let list=[...tickets].sort((a,b)=>b.openTime-a.openTime);
+  if(ftab!=='all') list=list.filter(t=>t.status===ftab);
+  if(ff2) list=list.filter(t=>t.field===ff2);
+  if(fs2) list=list.filter(t=>t.status===fs2);
+  if(q) list=list.filter(t=>t.id.toLowerCase().includes(q)||t.field.toLowerCase().includes(q)||t.site.toLowerCase().includes(q)||(t.problem||'').toLowerCase().includes(q));
+  renderTblInto('all-tbl', list, true);
+}
+function setFtab(b,v){document.querySelectorAll('.ftab').forEach(x=>x.classList.remove('active'));b.classList.add('active');ftab=v;renderAll();}
+
+// ═══════════════════════════════════════════════════
+// LAPORAN + PERIOD FILTER
+// ═══════════════════════════════════════════════════
+function selAllMonths(btn){
+  selMonths.clear();
+  document.querySelectorAll('#month-chips .mchip').forEach(c=>c.classList.remove('sel'));
+  btn.classList.add('all-sel');
+  renderRpt();
+}
+function toggleMonth(btn, m){
+  // Remove all-sel from "Semua"
+  document.querySelector('#month-chips .mchip').classList.remove('all-sel');
+  const mi = parseInt(m);
+  if(selMonths.has(mi)){selMonths.delete(mi);btn.classList.remove('sel');}
+  else{selMonths.add(mi);btn.classList.add('sel');}
+  if(selMonths.size===0) document.querySelector('#month-chips .mchip').classList.add('all-sel');
+  renderRpt();
+}
+
+function renderRpt(){
+  const ff2=document.getElementById('rptf')?.value||'';
+  const fp=document.getElementById('rptp')?.value||'';
+  const fy=document.getElementById('rpty')?.value||'';
+  // Populate year filter
+  const allYears=[...new Set(tickets.map(t=>getYear(t.openTime)))].sort((a,b)=>b-a);
+  const ysel=document.getElementById('rpty');
+  if(ysel){const cv=ysel.value;ysel.innerHTML='<option value="">Semua Tahun</option>'+allYears.map(y=>`<option${String(y)===cv?' selected':''}>${y}</option>`).join('');}
+  // Populate perangkat filter
+  const allP=[...new Set(tickets.map(t=>t.perangkat))].sort();
+  const psel=document.getElementById('rptp');
+  if(psel){const cv=psel.value;psel.innerHTML='<option value="">Semua Perangkat</option>'+allP.map(p=>`<option${p===cv?' selected':''}>${p}</option>`).join('');}
+
+  let list=tickets.filter(t=>t.status==='CLOSE');
+  if(ff2) list=list.filter(t=>t.field===ff2);
+  if(fp)  list=list.filter(t=>t.perangkat===fp);
+  if(fy)  list=list.filter(t=>String(getYear(t.openTime))===fy);
+  if(selMonths.size>0) list=list.filter(t=>selMonths.has(getMonth(t.openTime)));
+
+  // Period summary
+  let periodTxt='Semua periode';
+  if(selMonths.size>0){
+    const names=[...selMonths].sort((a,b)=>a-b).map(m=>MONTHS[m]);
+    periodTxt=names.join(', ')+(fy?' '+fy:'');
+  } else if(fy) periodTxt='Tahun '+fy;
+  document.getElementById('period-summary').textContent=`Menampilkan: ${list.length} tiket | ${periodTxt}`;
+
+  let tR=0,tD=0,tM=0,tS=0;const n=list.length;
+  let tbody='';
+  list.sort((a,b)=>a.openTime-b.openTime).forEach((t,i)=>{
+    const c=calc(t);
+    tR+=c.restitusi;tD+=Math.max(0,c.denda);tM+=c.mttr;tS+=c.sla;
+    const mo=MONTHS[getMonth(t.openTime)]+' '+getYear(t.openTime);
+    tbody+=`<tr onclick="openDetail('${t.id}')" style="cursor:pointer">
+      <td style="color:var(--muted)">${i+1}</td>
+      <td class="td-mono" style="color:var(--blue);font-weight:600">${t.id}</td>
+      <td><span style="background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:1px 7px;font-size:10px;font-weight:600">${mo}</span></td>
+      <td>${t.field}</td><td>${t.site}</td><td>${t.perangkat}</td>
+      <td class="td-mono">${fDT(t.openTime)}</td><td class="td-mono">${fDT(t.closeTime)}</td>
+      <td class="td-mono">${c.totalMins.toFixed(1)}</td>
+      <td class="td-mono" style="color:var(--yellow)">${c.holdMins.toFixed(1)}</td>
+      <td class="td-mono" style="color:var(--cyan)">${c.efektif.toFixed(1)}</td>
+      <td class="td-mono" style="color:var(--purple)">${fMon(c.tarif)}</td>
+      <td>${slaBadge(c.sla)}</td>
+      <td class="td-mono" style="color:${c.restitusi>0?'var(--red)':'var(--green)'}">${fMon(c.restitusi)}</td>
+      <td class="td-mono" style="color:${c.denda>0?'var(--orange)':'var(--green)'}">${c.denda>0?fMon(c.denda):'—'}</td>
+    </tr>`;
+  });
+  // Footer totals
+  document.getElementById('rpt-foot').innerHTML=n?`<tr style="background:var(--s2);font-weight:700">
+    <td colspan="12" style="text-align:right;padding:10px 12px;font-size:11px;color:var(--muted)">TOTAL (${n} tiket)</td>
+    <td class="td-mono" style="color:${tR>0?'var(--red)':'var(--green)'};padding:10px 12px">${fMon(tR)}</td>
+    <td class="td-mono" style="color:${tD>0?'var(--orange)':'var(--green)'};padding:10px 12px">${tD>0?fMon(tD):'—'}</td>
+  </tr>`:'';
+  document.getElementById('rpt-body').innerHTML=tbody||`<tr><td colspan="15" style="text-align:center;padding:30px;color:var(--muted)">Tidak ada data untuk filter yang dipilih</td></tr>`;
+  const avgS=n?tS/n:1;const sC=avgS>=.95?'var(--green)':avgS>=.8?'var(--yellow)':'var(--red)';
+  document.getElementById('rpt-count').textContent=`${n} tiket`;
+  document.getElementById('rpt-cards').innerHTML=`
+    <div class="report-card"><div class="report-card-title">📊 Ringkasan Tiket</div>
+      <div class="metric"><span class="metric-label">Total Tiket</span><span class="metric-val">${n}</span></div>
+      <div class="metric"><span class="metric-label">Avg SLA</span><span class="metric-val" style="color:${sC}">${fPct(avgS)}</span></div>
+      <div class="metric"><span class="metric-label">Total MTTR</span><span class="metric-val" style="color:var(--cyan)">${tM.toFixed(0)} mnt</span></div>
+      <div class="metric"><span class="metric-label">Kena Denda</span><span class="metric-val" style="color:var(--orange)">${list.filter(t=>calc(t).denda>0).length} tiket</span></div>
+    </div>
+    <div class="report-card"><div class="report-card-title">💰 Total Restitusi</div>
+      <div class="metric"><span class="metric-label">Total</span><span class="metric-val" style="color:var(--red)">${fMon(tR)}</span></div>
+      <div class="metric"><span class="metric-label">Tiket Restitusi</span><span class="metric-val">${list.filter(t=>calc(t).restitusi>0).length}</span></div>
+      <div class="metric"><span class="metric-label">Avg / Tiket</span><span class="metric-val">${n?fMon(tR/n):'Rp 0'}</span></div>
+      <div class="metric"><span class="metric-label">Periode</span><span class="metric-val" style="font-size:10px;color:var(--muted)">${periodTxt}</span></div>
+    </div>
+    <div class="report-card"><div class="report-card-title">⚠️ Total Denda</div>
+      <div class="metric"><span class="metric-label">Total</span><span class="metric-val" style="color:var(--orange)">${fMon(tD)}</span></div>
+      <div class="metric"><span class="metric-label">Tiket Denda</span><span class="metric-val">${list.filter(t=>calc(t).denda>0).length}</span></div>
+      <div class="metric"><span class="metric-label">Avg / Tiket</span><span class="metric-val">${n?fMon(tD/n):'Rp 0'}</span></div>
+      <div class="metric"><span class="metric-label">MTTR Avg</span><span class="metric-val" style="color:var(--cyan)">${n?(tM/n).toFixed(0)+' mnt':'—'}</span></div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// CREATE TICKET
+// ═══════════════════════════════════════════════════
+function openCreateModal(){
+  ['isite','ilok','iket'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['iperangkat','iprob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('ipj').value='LINTASARTA';
+  document.getElementById('iganti').value='NO';
+  document.querySelectorAll('.err-msg').forEach(e=>e.classList.remove('show'));
+  document.querySelectorAll('#fchips .chip').forEach(c=>c.classList.remove('selected'));
+  document.querySelector('#fchips .chip').classList.add('selected');
+  selF='PRABUMULIH';
+  SO('m-create');
+}
+function selField(el){document.querySelectorAll('#fchips .chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selF=el.dataset.v;}
+
+function createTkt(){
+  let ok=true;
+  if(!document.getElementById('isite').value.trim()){document.getElementById('esite').classList.add('show');ok=false;}else document.getElementById('esite').classList.remove('show');
+  if(!document.getElementById('iperangkat').value){document.getElementById('eperangkat').classList.add('show');ok=false;}else document.getElementById('eperangkat').classList.remove('show');
+  if(!document.getElementById('iprob').value){document.getElementById('eprob').classList.add('show');ok=false;}else document.getElementById('eprob').classList.remove('show');
+  if(!ok) return;
+  const now=Date.now();
+  const id=genId();
+  const t={
+    id, field:selF,
+    site: document.getElementById('isite').value.trim(),
+    lokasi: document.getElementById('ilok').value.trim(),
+    perangkat: document.getElementById('iperangkat').value,
+    problem: document.getElementById('iprob').value,
+    keterangan: document.getElementById('iket').value.trim(),
+    pj: document.getElementById('ipj').value,
+    gantiPerangkat: document.getElementById('iganti').value,
+    status:'OPEN', openTime:now, closeTime:null, holds:[],
+    createdBy: curUser?.name||'—',
+    createdRole: curUser?.role||'—',
+    timeline:[{ts:now,type:'open',user:curUser?.name||'—',text:'Tiket dibuat — Timer mulai berjalan'}]
+  };
+  tickets.unshift(t); save(t);
+  CM('m-create');
+  toast('✅',`Tiket ${id} dibuat! Timer berjalan.`);
+  renderDash();
+}
+
+// ═══════════════════════════════════════════════════
+// ON HOLD
+// ═══════════════════════════════════════════════════
+function openHoldModal(id){
+  actId=id;
+  document.getElementById('ihold').value='';
+  document.getElementById('ehold').classList.remove('show');
+  CM('m-detail'); setTimeout(()=>SO('m-hold'),150);
+}
+function doHold(){
+  const r=document.getElementById('ihold').value.trim();
+  if(!r){document.getElementById('ehold').classList.add('show');return;}
+  const t=tickets.find(x=>x.id===actId);if(!t)return;
+  const now=Date.now();
+  if(!t.holds) t.holds=[];
+  t.status='ON HOLD';
+  t.holds.push({holdTime:now, resumeTime:null, reason:r}); // null disimpan via nullSafe→'__NULL__'
+  t.timeline.push({ts:now,type:'hold',user:curUser?.name||'—',text:'Tiket di-ON HOLD',just:r});
+  save(t); CM('m-hold');
+  toast('⏸',`Tiket ${t.id} di-ON HOLD`);
+  renderDash();
+  if(document.getElementById('page-tiket').classList.contains('active')) renderAll();
+  setTimeout(function(){ openDetail(actId); }, 300);
+}
+
+// ═══════════════════════════════════════════════════
+// RESUME
+// ═══════════════════════════════════════════════════
+function doResume(id){
+  const t=tickets.find(x=>x.id===id);if(!t)return;
+  const now=Date.now();
+  if(!t.holds) t.holds=[];
+  const lh=t.holds[t.holds.length-1];
+  // resumeTime bisa null atau '__NULL__' (sentinel dari Firebase)
+  if(lh && (!lh.resumeTime || lh.resumeTime==='__NULL__')) lh.resumeTime=now;
+  t.status='OPEN';
+  t.timeline.push({ts:now,type:'resume',user:curUser?.name||'—',text:'Tiket di-RESUME — Timer berjalan kembali'});
+  save(t);
+  toast('▶',`Tiket ${t.id} di-resume`);
+  renderDash();
+  if(document.getElementById('page-tiket').classList.contains('active')) renderAll();
+  setTimeout(function(){ CM('m-detail'); openDetail(id); }, 300);
+}
+
+// ═══════════════════════════════════════════════════
+// CLOSE
+// ═══════════════════════════════════════════════════
+function openCloseModal(id){
+  actId=id;
+  const t=tickets.find(x=>x.id===id);
+  document.getElementById('isol').value='';
+  document.getElementById('icloseganti').value=t?.gantiPerangkat||'NO';
+  document.getElementById('esol').classList.remove('show');
+  if(t){
+    const c=calc(t);
+    document.getElementById('close-preview').innerHTML=`<div style="color:var(--muted);margin-bottom:6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Preview SLA saat ditutup</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div><div style="font-size:10px;color:var(--muted)">Durasi Aktif</div><div style="font-family:'IBM Plex Mono',monospace;color:var(--cyan)">${fDur(c.mttr)}</div></div><div><div style="font-size:10px;color:var(--muted)">SLA</div><div>${slaBadge(c.sla)}</div></div><div><div style="font-size:10px;color:var(--muted)">Est. Denda</div><div style="font-family:'IBM Plex Mono',monospace;color:${c.denda>0?'var(--orange)':'var(--green)'}">${c.denda>0?fMon(c.denda):'Tidak ada'}</div></div></div>`;
+  }
+  CM('m-detail'); setTimeout(()=>SO('m-close'),150);
+}
+function doClose(){
+  const sol=document.getElementById('isol').value.trim();
+  if(!sol){document.getElementById('esol').classList.add('show');return;}
+  const t=tickets.find(x=>x.id===actId);if(!t)return;
+  const now=Date.now();
+  if(t.status==='ON HOLD'){const lh=t.holds[t.holds.length-1];if(lh&&!lh.resumeTime)lh.resumeTime=now;}
+  t.status='CLOSE'; t.closeTime=now; t.solution=sol;
+  t.gantiPerangkat=document.getElementById('icloseganti').value;
+  t.closedBy=curUser?.name||'—';
+  t.timeline.push({ts:now,type:'close',user:curUser?.name||'—',text:`Tiket CLOSED — ${sol}`});
+  save(t); CM('m-close');
+  const c=calc(t);
+  toast('✅',`Tiket ${t.id} ditutup | SLA: ${fPct(c.sla)}`);
+  // Stop timer chip langsung di DOM tanpa tunggu listener
+  document.querySelectorAll(`.timer-chip[data-tid="${t.id}"]`).forEach(chip=>{
+    chip.textContent = fDur(liveMins(t)) + ' (selesai)';
+    chip.className   = 'timer-chip';
+    chip.removeAttribute('data-tid'); // stop global updater dari update chip ini
+  });
+  renderDash();
+  if(document.getElementById('page-tiket').classList.contains('active')) renderAll();
+}
+
+// ═══════════════════════════════════════════════════
+// DETAIL MODAL
+// ═══════════════════════════════════════════════════
+function openDetail(id){
+  const t=tickets.find(x=>x.id===id);if(!t)return;
+  actId=id;if(detIv)clearInterval(detIv);
+  function fill(){
+    document.getElementById('dt-title').textContent=`${t.id} — ${t.site||t.field}`;
+    document.getElementById('dt-sub').textContent=`Dibuat: ${fDT(t.openTime)} | Oleh: ${t.createdBy||'—'} (${t.createdRole||'—'})`;
+    document.getElementById('dt-field').textContent=t.field;
+    document.getElementById('dt-site').textContent=t.site||'—';
+    document.getElementById('dt-lok').textContent=t.lokasi||'—';
+    document.getElementById('dt-prkt').textContent=t.perangkat;
+    document.getElementById('dt-pj').textContent=t.pj;
+    document.getElementById('dt-status').innerHTML=sBadge(t.status);
+    document.getElementById('dt-tin').textContent=fDT(t.openTime);
+    document.getElementById('dt-tout').textContent=t.closeTime?fDT(t.closeTime):'Belum ditutup';
+    document.getElementById('dt-prob').textContent=t.problem||'—';
+    document.getElementById('dt-ket').textContent=t.keterangan||'—';
+    const dur=liveMins(t);
+    var timerClass = t.status==='ON HOLD'?'hold':t.status==='OPEN'?'running':'';
+    var timerLabel = t.status==='CLOSE' ? fDur(dur)+' (selesai)' : fDur(dur);
+    document.getElementById('dt-timer').innerHTML=`<span class="timer-chip ${timerClass}">${timerLabel}</span>`;
+    const hb=document.getElementById('dt-holdbar');
+    if(t.status==='ON HOLD'){hb.style.display='flex';const lh=t.holds.slice(-1)[0];document.getElementById('dt-holdreason').textContent=lh?.reason||'';}
+    else hb.style.display='none';
+    const c=calc(t);
+    if(t.status==='CLOSE'){
+      document.getElementById('dt-calc').style.display='grid';
+      document.getElementById('dt-mttr').textContent=fDur(c.mttr)+' ('+c.efektif.toFixed(1)+' mnt)';
+      document.getElementById('dt-sla').innerHTML=slaBadge(c.sla);
+      document.getElementById('dt-tarif').textContent=fMon(c.tarif);
+      document.getElementById('dt-rest').textContent=fMon(c.restitusi);
+      document.getElementById('dt-denda').textContent=c.denda>0?fMon(c.denda):'Tidak ada denda';
+      document.getElementById('dt-ganti').textContent=t.gantiPerangkat==='YES'?'✅ Ya':'❌ Tidak';
+    } else document.getElementById('dt-calc').style.display='none';
+    document.getElementById('dt-tl').innerHTML=(t.timeline||[]).map(tl=>
+      `<div class="tl-item ${tl.type}">
+        <div class="tl-time">${fDT(tl.ts)}</div>
+        <div class="tl-text">${tl.text}</div>
+        ${tl.user?uLabel(tl.user):''}
+        ${tl.just?`<div class="tl-just" style="margin-top:5px;font-size:11px;color:var(--yellow);font-style:italic;background:var(--yellow-bg);padding:4px 8px;border-radius:4px;border-left:2px solid var(--yellow)">📝 ${tl.just}</div>`:''}
+      </div>`
+    ).join('');
+    let acts='';
+    if(t.status==='OPEN'){acts=`<button class="btn btn-yellow" onclick="openHoldModal('${t.id}')">⏸ ON HOLD</button><button class="btn btn-red" onclick="openCloseModal('${t.id}')">✅ CLOSE Tiket</button>`;}
+    else if(t.status==='ON HOLD'){acts=`<button class="btn btn-green" onclick="doResume('${t.id}')">▶ Resume</button><button class="btn btn-red" onclick="openCloseModal('${t.id}')">✅ CLOSE Tiket</button>`;}
+    else acts='<span style="color:var(--muted);font-size:12px">✓ Tiket telah ditutup</span>';
+    const delBtn = curUser?.canDelete
+      ? `<button class="btn" style="background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.3);margin-left:8px" onclick="openDeleteModal('${t.id}')">🗑 Hapus Tiket</button>`
+      : '';
+    const canEdit = curUser && !curUser.viewOnly && (curUser.name==='CO1' || curUser.name==='CO2');
+    const editBtn = canEdit
+      ? `<button class="btn" style="background:var(--s2);border:1px solid var(--bdr);color:var(--txt);margin-left:auto" onclick="openEditModal('${t.id}')">✏️ Edit Tiket</button>`
+      : '';
+    document.getElementById('dt-acts').innerHTML=`<button class="btn btn-ghost" onclick="CM('m-detail')">Tutup</button>${editBtn}${acts}${delBtn}`;
+  }
+  fill(); SO('m-detail');
+  if(t.status!=='CLOSE') detIv=setInterval(fill,1000);
+}
+
+// ═══════════════════════════════════════════════════
+// EDIT TICKET
+// ═══════════════════════════════════════════════════
+var editSelF = '';
+
+function editSelField(el){
+  document.querySelectorAll('#edit-fchips .chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  editSelF = el.dataset.v;
+}
+
+function openEditModal(id){
+  if(!curUser || curUser.viewOnly || (curUser.name!=='CO1' && curUser.name!=='CO2')){
+    toast('🚫','Hanya CO1 dan CO2 yang dapat mengedit tiket'); return;
+  }
+  const t = tickets.find(x=>x.id===id);
+  if(!t){ toast('⚠️','Tiket tidak ditemukan'); return; }
+
+  // Isi form dengan data tiket saat ini
+  document.getElementById('edit-sub').textContent = 'Editing: '+t.id+' — '+t.site+' | '+t.field;
+
+  // Tampilkan section waktu hanya untuk CO1
+  const timeSection = document.getElementById('edit-time-section');
+  timeSection.style.display = curUser.name==='CO1' ? 'block' : 'none';
+
+  // Isi field waktu jika ada
+  if(curUser.name==='CO1'){
+    // Convert timestamp ke datetime-local format
+    function tsToLocal(ts){
+      if(!ts) return '';
+      const d = new Date(ts);
+      const pad = n => String(n).padStart(2,'0');
+      return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+
+             'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+    }
+    document.getElementById('edit-timein').value  = tsToLocal(t.openTime);
+    document.getElementById('edit-timeout').value = tsToLocal(t.closeTime);
+    // Sembunyikan timeout jika tiket masih OPEN
+    document.getElementById('edit-grp-timeout').style.display =
+      t.status==='CLOSE' ? '' : 'none';
+  }
+
+  // Set field chip
+  editSelF = t.field;
+  document.querySelectorAll('#edit-fchips .chip').forEach(c=>{
+    c.classList.toggle('selected', c.dataset.v === t.field);
+  });
+
+  document.getElementById('edit-site').value     = t.site    || '';
+  document.getElementById('edit-lok').value      = t.lokasi  || '';
+  document.getElementById('edit-perangkat').value= t.perangkat|| '';
+  document.getElementById('edit-pj').value       = t.pj      || 'LINTASARTA';
+  document.getElementById('edit-prob').value     = t.problem || '';
+  document.getElementById('edit-ket').value      = t.keterangan || '';
+  document.getElementById('edit-ganti').value    = t.gantiPerangkat || 'NO';
+
+  // Bersihkan error
+  document.querySelectorAll('#m-edit .err-msg').forEach(e=>e.classList.remove('show'));
+
+  CM('m-detail');
+  SO('m-edit');
+}
+
+function saveEdit(){
+  if(!curUser || curUser.viewOnly || (curUser.name!=='CO1' && curUser.name!=='CO2')){
+    toast('🚫','Hanya CO1 dan CO2 yang dapat mengedit tiket'); return;
+  }
+  const t = tickets.find(x=>x.id===actId);
+  if(!t){ toast('⚠️','Tiket tidak ditemukan'); return; }
+
+  // Validasi
+  let ok = true;
+  const site  = document.getElementById('edit-site').value.trim();
+  const prkt  = document.getElementById('edit-perangkat').value;
+  const prob  = document.getElementById('edit-prob').value;
+
+  if(!site){ document.getElementById('eem-site').classList.add('show');     ok=false; }
+  else        document.getElementById('eem-site').classList.remove('show');
+  if(!prkt){ document.getElementById('eem-perangkat').classList.add('show');ok=false; }
+  else        document.getElementById('eem-perangkat').classList.remove('show');
+  if(!prob){ document.getElementById('eem-prob').classList.add('show');     ok=false; }
+  else        document.getElementById('eem-prob').classList.remove('show');
+  if(!ok) return;
+
+  // Simpan nilai lama untuk log timeline
+  const oldField = t.field, oldSite = t.site, oldPrkt = t.perangkat;
+
+  // Update data tiket
+  t.field         = editSelF || t.field;
+  t.site          = site;
+  t.lokasi        = document.getElementById('edit-lok').value.trim();
+  t.perangkat     = prkt;
+  t.pj            = document.getElementById('edit-pj').value;
+  t.problem       = prob;
+  t.keterangan    = document.getElementById('edit-ket').value.trim();
+  t.gantiPerangkat= document.getElementById('edit-ganti').value;
+
+  // Catat di timeline
+  const changes = [];
+  if(oldField !== t.field) changes.push('Field: '+oldField+' → '+t.field);
+  if(oldSite  !== t.site)  changes.push('Site: '+oldSite+' → '+t.site);
+  if(oldPrkt  !== t.perangkat) changes.push('Perangkat: '+oldPrkt+' → '+t.perangkat);
+
+  // CO1: proses perubahan waktu
+  if(curUser.name==='CO1'){
+    const tinVal  = document.getElementById('edit-timein').value;
+    const toutVal = document.getElementById('edit-timeout').value;
+
+    if(tinVal){
+      const newOpen = new Date(tinVal).getTime();
+      if(!isNaN(newOpen) && newOpen !== t.openTime){
+        changes.push('Waktu Open: '+fDT(t.openTime)+' → '+fDT(newOpen));
+        t.openTime = newOpen;
+        // Update timeline entry pertama jika ada
+        if(t.timeline && t.timeline[0]) t.timeline[0].ts = newOpen;
+      }
+    }
+    if(toutVal && t.status==='CLOSE'){
+      const newClose = new Date(toutVal).getTime();
+      if(!isNaN(newClose) && newClose > t.openTime && newClose !== t.closeTime){
+        changes.push('Waktu Close: '+fDT(t.closeTime)+' → '+fDT(newClose));
+        t.closeTime = newClose;
+        // Update timeline entry close jika ada
+        const tlClose = (t.timeline||[]).find(x=>x.type==='close');
+        if(tlClose) tlClose.ts = newClose;
+      } else if(!isNaN(newClose) && newClose <= t.openTime){
+        toast('⚠️','Waktu Close harus setelah Waktu Open'); return;
+      }
+    }
+  }
+
+  t.timeline.push({
+    ts:   Date.now(),
+    type: 'edit',
+    user: curUser.name,
+    text: '✏️ Data tiket diedit oleh '+curUser.name+(changes.length?' — '+changes.join(', '):'')
+  });
+
+  save(t);
+  CM('m-edit');
+  toast('✅','Tiket '+t.id+' berhasil diperbarui!');
+
+  // Refresh tampilan
+  renderDash();
+  if(document.getElementById('page-tiket').classList.contains('active')) renderAll();
+}
+
+// ═══════════════════════════════════════════════════
+// EXPORT CSV
+// ═══════════════════════════════════════════════════
+function exportCSV(){
+  const ff2=document.getElementById('rptf')?.value||'';
+  const fy=document.getElementById('rpty')?.value||'';
+  let list=tickets.filter(t=>t.status==='CLOSE');
+  if(ff2) list=list.filter(t=>t.field===ff2);
+  if(fy)  list=list.filter(t=>String(getYear(t.openTime))===fy);
+  if(selMonths.size>0) list=list.filter(t=>selMonths.has(getMonth(t.openTime)));
+  const hdr=['ID Tiket','Bulan','Tahun','Field','Site','Lokasi','Perangkat','PJ','Dibuat Oleh','Time In','Time Close','Durasi Total(Mnt)','Hold(Mnt)','MTTR(Mnt)','Tarif','SLA(%)','Restitusi','Denda','Problem','Solution','Ganti Perangkat'];
+  const rows=list.map(t=>{
+    const c=calc(t);
+    return[t.id,MONTHS[getMonth(t.openTime)],getYear(t.openTime),t.field,t.site,t.lokasi||'',t.perangkat,t.pj,t.createdBy||'—',fDT(t.openTime),fDT(t.closeTime),c.totalMins.toFixed(1),c.holdMins.toFixed(1),c.efektif.toFixed(1),c.tarif,(c.sla*100).toFixed(2),c.restitusi.toFixed(2),c.denda.toFixed(2),t.problem||'',t.solution||'',t.gantiPerangkat]
+    .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+  });
+  const blob=new Blob(['\uFEFF'+[hdr.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  const mn=selMonths.size?[...selMonths].sort((a,b)=>a-b).map(m=>MONTHS[m]).join('-'):'ALL';
+  a.download=`laporan_sla_${fy||new Date().getFullYear()}_${mn}.csv`;
+  a.click();
+  toast('⬇','File CSV berhasil diunduh');
+}
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function SO(id){document.getElementById(id).classList.add('show');}
+function CM(id){document.getElementById(id).classList.remove('show');if(id==='m-detail'&&detIv){clearInterval(detIv);detIv=null;}}
+let toastT=null;
+function toast(ic,msg){document.getElementById('ti').textContent=ic;document.getElementById('tm').textContent=msg;const el=document.getElementById('toast');el.classList.add('show');if(toastT)clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3500);}
+
+// Live timers
+setInterval(()=>{
+  document.querySelectorAll('.timer-chip[data-tid]').forEach(chip=>{
+    const t=tickets.find(x=>x.id===chip.dataset.tid);
+    if(!t) return;
+    if(t.status==='CLOSE'){
+      // Tiket sudah CLOSE — hentikan timer dan tampilkan durasi final
+      chip.textContent = fDur(liveMins(t)) + ' (selesai)';
+      chip.className   = 'timer-chip';
+      chip.removeAttribute('data-tid');
+      return;
+    }
+    chip.textContent=fDur(liveMins(t));
+    chip.className='timer-chip '+(t.status==='ON HOLD'?'hold':'running');
+  });
+},1000);
+
+
+// ═══════════════════════════════════════════════════
+// INPUT MANUAL — CO1 ONLY
+// ═══════════════════════════════════════════════════
+var mSelF = 'PRABUMULIH';
+
+function mSelField(el){
+  document.querySelectorAll('#mfchips .chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  mSelF = el.dataset.v;
+}
+
+function renderManual(){
+  // Set default datetime ke awal bulan ini
+  var now = new Date();
+  var y = now.getFullYear();
+  var mo = String(now.getMonth()+1).padStart(2,'0');
+  var defDt = y+'-'+mo+'-01T08:00';
+  var tin = document.getElementById('m-timein');
+  var tout = document.getElementById('m-timeout');
+  if(tin && !tin.value) tin.value = defDt;
+  if(tout && !tout.value){ var d2=new Date(y,now.getMonth(),1,12,0); tout.value=y+'-'+mo+'-01T12:00'; }
+  updateManualPreview();
+}
+
+function updateManualPreview(){
+  var tin   = document.getElementById('m-timein')?.value;
+  var tout  = document.getElementById('m-timeout')?.value;
+  var prkt  = document.getElementById('m-perangkat')?.value;
+  var holdM = parseFloat(document.getElementById('m-holdmin')?.value)||0;
+  var ganti = document.getElementById('m-ganti')?.value||'NO';
+  var card  = document.getElementById('m-preview-card');
+  var grid  = document.getElementById('m-sla-grid');
+  if(!tin||!tout||!prkt||!card||!grid){card&&(card.style.display='none');return;}
+  var tsIn  = new Date(tin).getTime();
+  var tsOut = new Date(tout).getTime();
+  if(tsOut<=tsIn){card.style.display='none';return;}
+
+  // t_n = durasi penuh tiket (menit)
+  var totalMins = (tsOut - tsIn) / 60000;
+  // MTTR aktif = untuk display SLA saja
+  var mttr  = Math.max(0, totalMins - holdM);
+  var tarif = TARIF[prkt] || 136300;
+
+  // MBL calendar-based sesuai bulan Time In
+  var dIn = new Date(tsIn);
+  var daysInMonth = new Date(dIn.getFullYear(), dIn.getMonth()+1, 0).getDate();
+  var mbl = daysInMonth * 24 * 60;
+
+  // SLA = 1 - (MTTR_aktif / MBL)
+  var sla = Math.max(0, Math.min(1, 1 - (mttr / mbl)));
+
+  // Restitusi (Rumus Kontrak B.1)
+  var batasMTTR = ganti==='YES' ? 2880 : 120;
+  var efektif   = Math.max(0, totalMins - batasMTTR);
+  var rest      = efektif * tarif / mbl;
+
+  // Denda (Rumus Kontrak B.2)
+  var dendaBase = Math.max(0, totalMins - 720);
+  var denda     = dendaBase * tarif * 2 / mbl;
+
+  var slaColor = sla>=0.95?'var(--green)':sla>=0.8?'var(--yellow)':'var(--red)';
+  card.style.display='block';
+  grid.innerHTML = [
+    ['Durasi Total',   fDur(totalMins),             'var(--txt)'],
+    ['Hold',           holdM.toFixed(0)+' mnt',     'var(--yellow)'],
+    ['MTTR Aktif',     fDur(mttr),                  'var(--cyan)'],
+    ['SLA',            fPct(sla),                   slaColor],
+    ['MBL Bulan Ini',  mbl+' mnt ('+daysInMonth+'hr)', 'var(--muted)'],
+    ['Batas MTTR',     batasMTTR+' mnt',            'var(--muted)'],
+    ['Efektif',        fDur(efektif),               efektif>0?'var(--orange)':'var(--green)'],
+    ['Tarif/Bln',      fMon(tarif),                 'var(--purple)'],
+    ['Restitusi',      rest>0?fMon(rest):'—',       rest>0?'var(--red)':'var(--green)'],
+    ['Denda',          denda>0?fMon(denda):'—',     denda>0?'var(--orange)':'var(--green)'],
+  ].map(function(x){
+    return '<div class="sla-box"><div class="sla-box-lbl">'+x[0]+'</div><div class="sla-box-val" style="color:'+x[2]+'">'+x[1]+'</div></div>';
+  }).join('');
+}
+
+function resetManualForm(){
+  ['m-site','m-lok','m-ket','m-sol'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['m-perangkat','m-prob'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('m-pj').value='LINTASARTA';
+  document.getElementById('m-ganti').value='NO';
+  document.getElementById('m-holdmin').value='0';
+  document.getElementById('m-timein').value='';
+  document.getElementById('m-timeout').value='';
+  document.getElementById('m-preview-card').style.display='none';
+  document.querySelectorAll('.err-msg').forEach(function(e){e.classList.remove('show');});
+  document.querySelectorAll('#mfchips .chip').forEach(function(c){c.classList.remove('selected');});
+  document.querySelector('#mfchips .chip').classList.add('selected');
+  mSelF='PRABUMULIH';
+  toast('🔄','Form direset');
+}
+
+// ── Mode manual: 'CLOSE' (default) atau 'OPEN' ──────────────────────────
+var manualMode = 'CLOSE';
+
+function setManualMode(mode){
+  manualMode = mode;
+  var isClose = mode === 'CLOSE';
+
+  // Toggle tab style
+  var btnClose = document.getElementById('mtab-close');
+  var btnOpen  = document.getElementById('mtab-open');
+  btnClose.style.background = isClose ? 'var(--green)' : 'var(--s2)';
+  btnClose.style.color      = isClose ? '#fff' : 'var(--txt)';
+  btnClose.style.border     = isClose ? 'none' : '1px solid var(--bdr)';
+  btnOpen.style.background  = !isClose ? 'var(--red)' : 'var(--s2)';
+  btnOpen.style.color       = !isClose ? '#fff' : 'var(--txt)';
+  btnOpen.style.border      = !isClose ? 'none' : '1px solid var(--bdr)';
+
+  // Sembunyikan/tampilkan field yang tidak relevan
+  var display = isClose ? '' : 'none';
+  document.getElementById('m-grp-timeout').style.display = display;
+  document.getElementById('m-grp-hold').style.display    = display;
+  document.getElementById('m-grp-sol').style.display     = display;
+  document.getElementById('m-grp-ganti').style.display   = display;
+  document.getElementById('m-preview-card').style.display= isClose ? '' : 'none';
+
+  // Update info-box
+  document.getElementById('m-infobox').innerHTML = isClose
+    ? '⚠️ Mode <strong>CLOSE</strong> — Tiket langsung tersimpan sebagai SELESAI dengan kalkulasi SLA otomatis.'
+    : '🔴 Mode <strong>OPEN</strong> — Tiket tersimpan dengan status <strong>OPEN</strong>, bisa diproses lanjut (ON HOLD / CLOSE) seperti tiket biasa.';
+
+  // Update tombol
+  document.getElementById('m-submit-btn').textContent =
+    isClose ? '💾 Simpan Tiket Manual (CLOSE)' : '💾 Simpan Tiket Manual (OPEN)';
+}
+
+function submitManualTkt(){
+  if(!curUser?.canDelete){ toast('🚫','Hanya CO1 yang bisa menggunakan Input Manual'); return; }
+  var ok=true;
+  var site = document.getElementById('m-site').value.trim();
+  var prkt = document.getElementById('m-perangkat').value;
+  var prob = document.getElementById('m-prob').value;
+  var tin  = document.getElementById('m-timein').value;
+  var tout = manualMode === 'CLOSE' ? document.getElementById('m-timeout').value : null;
+  var sol  = manualMode === 'CLOSE' ? document.getElementById('m-sol').value.trim() : null;
+
+  if(!site){document.getElementById('em-site').classList.add('show');ok=false;}else document.getElementById('em-site').classList.remove('show');
+  if(!prkt){document.getElementById('em-perangkat').classList.add('show');ok=false;}else document.getElementById('em-perangkat').classList.remove('show');
+  if(!prob){document.getElementById('em-prob').classList.add('show');ok=false;}else document.getElementById('em-prob').classList.remove('show');
+  if(!tin){document.getElementById('em-timein').classList.add('show');ok=false;}else document.getElementById('em-timein').classList.remove('show');
+  if(manualMode==='CLOSE'){
+    if(!tout){document.getElementById('em-timeout').classList.add('show');ok=false;}else document.getElementById('em-timeout').classList.remove('show');
+    if(!sol){document.getElementById('em-sol').classList.add('show');ok=false;}else document.getElementById('em-sol').classList.remove('show');
+  }
+  if(!ok) return;
+
+  var tsIn  = new Date(tin).getTime();
+  var tsOut = tout ? new Date(tout).getTime() : null;
+  if(manualMode==='CLOSE' && tsOut <= tsIn){ toast('⚠️','Time Close harus setelah Time In'); return; }
+
+  var holdM = parseFloat(document.getElementById('m-holdmin').value)||0;
+
+  // Generate ID berdasarkan tanggal Time In (bukan sekarang)
+  var dateIn = new Date(tsIn);
+  var yyyy   = dateIn.getFullYear();
+  var mm     = String(dateIn.getMonth()+1).padStart(2,'0');
+  if(isNaN(yyyy) || isNaN(dateIn.getMonth())){
+    toast('⚠️','Tanggal Time In tidak valid'); return;
+  }
+  var key    = yyyy+'-'+mm;
+  monthCtr[key] = (monthCtr[key]||0)+1;
+  var id = yyyy+'-'+mm+'-'+String(monthCtr[key]).padStart(4,'0');
+
+  // Build holds array dari total hold minutes (simplified)
+  var holds = [];
+  if(holdM > 0){
+    // Representasikan hold sebagai 1 periode di tengah durasi
+    var midPoint = tsIn + (tsOut - tsIn)/2;
+    holds = [{
+      holdTime:   midPoint - (holdM*60000/2),
+      resumeTime: midPoint + (holdM*60000/2),
+      reason:     'Input manual — total hold '+holdM+' menit',
+      heldBy:     curUser.name
+    }];
+  }
+
+  var isClose = manualMode === 'CLOSE';
+  var t = {
+    id:            id,
+    field:         mSelF,
+    site:          site,
+    lokasi:        document.getElementById('m-lok').value.trim(),
+    perangkat:     prkt,
+    problem:       prob,
+    keterangan:    document.getElementById('m-ket').value.trim(),
+    pj:            document.getElementById('m-pj').value,
+    gantiPerangkat:isClose ? document.getElementById('m-ganti').value : 'NO',
+    status:        isClose ? 'CLOSE' : 'OPEN',
+    openTime:      tsIn,
+    closeTime:     isClose ? tsOut : null,
+    holds:         holds,
+    solution:      isClose ? sol : '',
+    createdBy:     curUser.name,
+    closedBy:      isClose ? curUser.name : '',
+    isManual:      true,
+    timeline: isClose
+      ? [{ts:tsIn,  type:'open',  user:curUser.name, text:'[INPUT MANUAL] Tiket dibuat oleh '+curUser.name},
+         {ts:tsOut, type:'close', user:curUser.name, text:'[INPUT MANUAL] Tiket CLOSED — '+sol}]
+      : [{ts:tsIn,  type:'open',  user:curUser.name, text:'[INPUT MANUAL] Tiket OPEN dibuat oleh '+curUser.name}]
+  };
+
+  tickets.unshift(t);
+  save(t);
+  db.ref('monthCtr').set(monthCtr);
+  toast('💾','Tiket manual '+id+' berhasil disimpan sebagai '+(isClose?'CLOSE':'OPEN')+'!');
+  resetManualForm();
+  // Refresh preview
+  var c2 = calc(t);
+  setTimeout(function(){
+    toast('📊','SLA: '+fPct(c2.sla)+' | Restitusi: '+fMon(c2.restitusi));
+  }, 2000);
+}
+
+// ═══════════════════════════════════════════════════
+// DELETE TICKET — CO1 ONLY
+// ═══════════════════════════════════════════════════
+function openDeleteModal(id){
+  if(!curUser?.canDelete){ toast('🚫','Hanya CO1 yang bisa menghapus tiket'); return; }
+  actId=id;
+  const t=tickets.find(x=>x.id===id); if(!t)return;
+  document.getElementById('del-prev-id').textContent   = t.id;
+  document.getElementById('del-prev-info').textContent = t.field+' — '+t.site+' | '+t.perangkat;
+  document.getElementById('del-prev-status').innerHTML = sBadge(t.status);
+  CM('m-detail');
+  setTimeout(()=>SO('m-delete'),200);
+}
+function confirmDelete(){
+  const idx=tickets.findIndex(x=>x.id===actId); if(idx===-1)return;
+  const delId=tickets[idx].id;
+  tickets.splice(idx,1); save();
+  CM('m-delete');
+  toast('🗑','Tiket '+delId+' berhasil dihapus oleh '+curUser.name);
+  renderDash();
+  if(document.getElementById('page-tiket').classList.contains('active')) renderAll();
+}
+
+// ═══════════════════════════════════════════════════
+// INIT — dipanggil dari waitForFirebase() callback
+// (tidak perlu dipanggil langsung di sini)
+</script>
+</body>
+</html>
