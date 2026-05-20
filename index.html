@@ -1120,7 +1120,8 @@ function genId(){
   const mm   = String(now.getMonth()+1).padStart(2,'0');
   if(isNaN(yyyy) || isNaN(now.getMonth())) return null; // guard NaN
   const key  = `${yyyy}-${mm}`;
-  monthCtr[key] = (monthCtr[key] || 0) + 1;
+  var cur = parseInt(monthCtr[key], 10); if(isNaN(cur)) cur = 0; // guard nilai rusak
+  monthCtr[key] = cur + 1;
   const seq  = String(monthCtr[key]).padStart(4,'0');
   save();
   return `${yyyy}-${mm}-${seq}`;
@@ -1158,17 +1159,27 @@ function initLoginPage(){
     monthCtr = data.monthCtr || {};
 
     // ── AUTO-HEAL monthCtr ─────────────────────────────────────────────
-    // Sinkronkan counter dengan nomor tiket TERTINGGI yang benar-benar ada,
-    // per bulan. Ini mencegah ID tabrakan (yang bisa menimpa tiket lama)
-    // setelah restore database, ketika node monthCtr hilang / tertinggal.
+    // Sinkronkan counter dengan nomor tiket TERTINGGI yang benar-benar ada
+    // (per bulan) DAN bersihkan nilai yang rusak (mis. objek/teks akibat
+    // restore database). Mencegah ID tabrakan maupun ID "[object Object]".
     (function syncMonthCtr(){
       var changed = false;
+      // 1) Paksa semua nilai monthCtr menjadi angka bulat. Nilai rusak → 0.
+      Object.keys(monthCtr).forEach(function(k){
+        var n = parseInt(monthCtr[k], 10);
+        if(typeof monthCtr[k] !== 'number' || isNaN(monthCtr[k])){
+          monthCtr[k] = isNaN(n) ? 0 : n;
+          changed = true;
+        }
+      });
+      // 2) Pastikan counter tiap bulan >= nomor tiket tertinggi yang ada.
       tickets.forEach(function(t){
         var m = /^(\d{4})-(\d{2})-(\d{4})$/.exec((t && t.id) || '');
         if(!m) return;
         var key = m[1] + '-' + m[2];           // contoh: "2026-05"
         var seq = parseInt(m[3], 10);          // contoh: 59
-        if(!monthCtr[key] || monthCtr[key] < seq){
+        var cur = parseInt(monthCtr[key], 10);
+        if(isNaN(cur) || cur < seq){
           monthCtr[key] = seq;
           changed = true;
         }
@@ -1180,7 +1191,7 @@ function initLoginPage(){
         });
         monthCtr = cleanCtr;
         db.ref('monthCtr').set(cleanCtr);
-        console.log('[AUTO-HEAL] monthCtr disinkronkan dengan ID tiket tertinggi:', cleanCtr);
+        console.log('[AUTO-HEAL] monthCtr dibersihkan & disinkronkan:', cleanCtr);
       }
     })();
 
@@ -2179,7 +2190,8 @@ function submitManualTkt(){
     toast('⚠️','Tanggal Time In tidak valid'); return;
   }
   var key    = yyyy+'-'+mm;
-  monthCtr[key] = (monthCtr[key]||0)+1;
+  var curM = parseInt(monthCtr[key], 10); if(isNaN(curM)) curM = 0; // guard nilai rusak
+  monthCtr[key] = curM + 1;
   var id = yyyy+'-'+mm+'-'+String(monthCtr[key]).padStart(4,'0');
 
   // Build holds array dari total hold minutes (simplified)
